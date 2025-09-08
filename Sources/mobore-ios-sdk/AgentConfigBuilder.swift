@@ -1,7 +1,6 @@
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
-import PersistenceExporter
 
 public class AgentConfigBuilder {
   private var enableAgent: Bool?
