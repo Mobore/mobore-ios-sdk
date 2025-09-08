@@ -25,6 +25,5 @@ public struct InstrumentationConfiguration {
   // Whether to exclude exporter endpoints (collector URLs) from instrumentation by default
   public var ignoreExporterURLsByDefault: Bool = true
   public var urlSessionShouldInstrument: ((URLRequest) -> Bool)?
-  public var storageConfiguration: PersistencePerformancePreset = .default
   public init() {}
 }
