@@ -1,7 +1,6 @@
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
-import PersistenceExporter
 
 public struct AgentConfiguration {
   init() {}
@@ -23,6 +22,4 @@ public struct AgentConfiguration {
 
   var spanAttributeInterceptor: any Interceptor<[String: AttributeValue]> = NoopInterceptor<[String: AttributeValue]>()
   var logRecordAttributeInterceptor: any Interceptor<[String: AttributeValue]> = NoopInterceptor<[String: AttributeValue]>()
-
-  // management URL removed with remote management feature
 }

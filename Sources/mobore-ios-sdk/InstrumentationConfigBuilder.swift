@@ -119,10 +119,6 @@ public class InstrumentationConfigBuilder {
     return self
   }
 
-  public func withPersistentStorageConfiguration(_ config: PersistencePerformancePreset) -> Self {
-    self.persistentStorageConfig = config
-    return self
-  }
 
   public func build() -> InstrumentationConfiguration {
     var config = InstrumentationConfiguration()
@@ -185,10 +181,6 @@ public class InstrumentationConfigBuilder {
 
     if let enableLogsExport = self.enableLogsExport {
       config.enableLogsExport = enableLogsExport
-    }
-
-    if let persistentStorageConfig = self.persistentStorageConfig {
-      config.storageConfiguration = persistentStorageConfig
     }
 
     if let urlSessionShouldInstrument = self.urlSessionShouldInstrument {
