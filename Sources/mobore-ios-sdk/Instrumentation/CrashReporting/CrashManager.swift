@@ -2,7 +2,6 @@
 import CrashReporter
 #endif
 import Foundation
-import Logging
 import OpenTelemetryApi
 import OpenTelemetrySdk
 

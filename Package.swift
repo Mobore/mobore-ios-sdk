@@ -17,11 +17,10 @@ let package = Package(
   ],
   dependencies: [
     .package(
-      url: "https://github.com/open-telemetry/opentelemetry-swift", revision: "f3679b30cbdc2a256355ced35913e1dc7d8ed657"),
+      url: "https://github.com/open-telemetry/opentelemetry-swift", .upToNextMajor(from: "2.1.0")),
     .package(url: "https://github.com/MobileNativeFoundation/Kronos.git", .upToNextMajor(from: "4.2.2")),
     .package(
       url: "https://github.com/microsoft/plcrashreporter.git", .upToNextMajor(from: "1.12.0")),
-    .package(url: "https://github.com/apple/swift-nio.git", .upToNextMajor(from: "2.0.0")),
   ],
   targets: [
     .target(
@@ -40,10 +39,6 @@ let package = Package(
           name: "CrashReporter",
           package: "plcrashreporter",
           condition: .when(platforms: [.macOS, .iOS, .tvOS])
-        ),
-        .product(
-          name: "NIOConcurrencyHelpers",
-          package: "swift-nio"
         ),
       ],
       path: "Sources/mobore-ios-sdk",
