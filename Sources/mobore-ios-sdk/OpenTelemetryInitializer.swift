@@ -1,5 +1,4 @@
 import Foundation
-import Logging
 import OpenTelemetryApi
 import OpenTelemetryProtocolExporterCommon
 import OpenTelemetryProtocolExporterHttp
@@ -139,3 +138,25 @@ class OpenTelemetryInitializer {
     return logExporter
   }
 }
+//
+//extension PersistencePerformancePreset {
+//    /// A custom preset offering a balance between performance and timely data delivery.
+//    static let balanced = PersistencePerformancePreset(
+//        // Storage settings
+//        maxFileSize: 10 * 1_024 * 1_024, // 10MB
+//        maxDirectorySize: 256 * 1_024 * 1_024, // 256MB
+//        maxFileAgeForWrite: 4.75,
+//        minFileAgeForRead: 4.75 + 0.5, // `maxFileAgeForWrite` + 0.5s margin
+//        maxFileAgeForRead: 24 * 60 * 60, // 24h
+//        maxObjectsInFile: 500,
+//        maxObjectSize: 2 * 1_024 * 1_024, // 2MB
+//        synchronousWrite: false,
+//
+//        // Export settings
+//        initialExportDelay: 5, // postpone to not impact app launch time
+//        defaultExportDelay: 5,
+//        minExportDelay: 1,
+//        maxExportDelay: 20,
+//        exportDelayChangeRate: 0.1
+//    )
+//}

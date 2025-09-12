@@ -1,7 +1,5 @@
 import Foundation
-import URLSessionInstrumentation
-import MemorySampler
-import CPUSampler
+import URLSession
 import NetworkStatus
 import OpenTelemetryApi
 

@@ -1,11 +1,18 @@
 #if os(iOS)
 import Foundation
-import NIOConcurrencyHelpers
 import OpenTelemetryApi
 import OpenTelemetrySdk
 import SwiftUI
 import UIKit
 import os
+
+private extension NSLock {
+  func withLockVoid(_ body: () -> Void) {
+    lock()
+    defer { unlock() }
+    body()
+  }
+}
 
 @available(iOS 13.0, *)
 public extension SwiftUICore.View {
@@ -16,7 +23,7 @@ public extension SwiftUICore.View {
 }
 
 internal class VCNameOverrideStore {
-  let nameLock = NIOLock()
+  let nameLock = NSLock()
   private var _name = ""
   public var name: String {
     get {
