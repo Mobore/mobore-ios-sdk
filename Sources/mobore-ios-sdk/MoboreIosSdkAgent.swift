@@ -187,4 +187,33 @@ public class MoboreIosSdkAgent {
   public static func removeGlobalAttribute(key: String) {
     GlobalAttributesStore.shared.remove(key: key)
   }
+
+  // View-scoped helpers
+  public static func setViewAttribute(key: String, value: String) {
+    if let span = OpenTelemetry.instance.contextProvider.activeSpan {
+      span.setAttribute(key: key, value: .string(value))
+    }
+  }
+
+  public static func setViewAttributes(_ attrs: [String: String]) {
+    if let span = OpenTelemetry.instance.contextProvider.activeSpan {
+      for (k, v) in attrs { span.setAttribute(key: k, value: .string(v)) }
+    }
+  }
+
+  public static func addViewEvent(name: String, attributes: [String: Any]) {
+    if let span = OpenTelemetry.instance.contextProvider.activeSpan {
+      var attrs: [String: AttributeValue] = [:]
+      attributes.forEach { key, value in
+        switch value {
+        case let v as String: attrs[key] = .string(v)
+        case let v as Bool: attrs[key] = .bool(v)
+        case let v as Double: attrs[key] = .double(v)
+        case let v as Int: attrs[key] = .int(v)
+        default: break
+        }
+      }
+      span.addEvent(name: name, attributes: attrs)
+    }
+  }
 }

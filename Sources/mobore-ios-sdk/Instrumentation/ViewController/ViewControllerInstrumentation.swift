@@ -161,6 +161,10 @@ internal class ViewControllerInstrumentation {
           .traceLogger
           .stopTrace(associatedObject: viewController,
                      preferredName: getViewControllerName(viewController))
+        // Ensure status is OK on view spans
+        if let span = OpenTelemetry.instance.contextProvider.activeSpan {
+          span.status = .ok
+        }
       }}
     }
   }
