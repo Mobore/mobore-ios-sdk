@@ -7,6 +7,9 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 import os.log
+#if os(iOS)
+import UIKit
+#endif
 
 public class MoboreIosSdkAgent {
  public static let name = "mobore-ios-sdk"
@@ -216,4 +219,64 @@ public class MoboreIosSdkAgent {
       span.addEvent(name: name, attributes: attrs)
     }
   }
+
+  // MARK: - UIViewController-based view control (for React Native)
+  #if os(iOS)
+  @MainActor private static func findTopViewController() -> UIViewController? {
+    let keyWindow = UIApplication.shared.connectedScenes
+      .compactMap { $0 as? UIWindowScene }
+      .flatMap { $0.windows }
+      .first { $0.isKeyWindow }
+    guard let root = keyWindow?.rootViewController else { return nil }
+    return topViewController(from: root)
+  }
+
+  @MainActor private static func topViewController(from root: UIViewController) -> UIViewController {
+    if let nav = root as? UINavigationController {
+      if let visible = nav.visibleViewController { return topViewController(from: visible) }
+      if let top = nav.topViewController { return topViewController(from: top) }
+    }
+    if let tab = root as? UITabBarController {
+      if let selected = tab.selectedViewController { return topViewController(from: selected) }
+    }
+    if let presented = root.presentedViewController {
+      return topViewController(from: presented)
+    }
+    if let lastChild = root.children.last {
+      return topViewController(from: lastChild)
+    }
+    return root
+  }
+
+  /// Starts a view trace tied to the current top UIViewController using the same machinery as ViewControllerInstrumentation.
+  /// If no UIViewController can be found, falls back to startView(name:url:).
+  public static func startUIViewControllerView(name: String? = nil, url: String? = nil) {
+    Task { @MainActor in
+      guard let vc = findTopViewController() else {
+        startView(name: name ?? "unknown", url: url)
+        return
+      }
+      let tracer = ViewControllerInstrumentation.getTracer()
+      let defaultName = "\(type(of: vc)) - view appearing"
+      let preferred = name ?? ViewControllerInstrumentation.getViewControllerName(vc)
+      _ = ViewControllerInstrumentation
+        .traceLogger
+        .startTrace(tracer: tracer,
+                    associatedObject: vc,
+                    name: defaultName,
+                    preferredName: preferred)
+    }
+  }
+
+  /// Ends the current UIViewController-tied view trace.
+  public static func endUIViewControllerView() {
+    Task { @MainActor in
+      let vc = findTopViewController()
+      ViewControllerInstrumentation
+        .traceLogger
+        .stopTrace(associatedObject: vc ?? NSObject(),
+                   preferredName: nil)
+    }
+  }
+  #endif
 }
