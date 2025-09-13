@@ -38,7 +38,11 @@ public struct MoboreLogRecordProcessor: LogRecordProcessor {
   public func onEmit(logRecord: OpenTelemetrySdk.ReadableLogRecord) {
     // recording flag via central config removed
     var appendedLogRecord = MutableLogRecord(from: logRecord)
-    appendedLogRecord.attributes = attributeInterceptor.intercept(appendedLogRecord.attributes)
+    var attrs = attributeInterceptor.intercept(appendedLogRecord.attributes)
+    // Merge global attributes
+    let globals = GlobalAttributesStore.shared.getAll()
+    for (k, v) in globals { attrs[k] = v }
+    appendedLogRecord.attributes = attrs
 
     let finalLogRecord = appendedLogRecord.finish()
 

@@ -102,4 +102,89 @@ public class MoboreIosSdkAgent {
   }
 
   deinit {}
+
+  // MARK: - Public RUM APIs (new)
+  public static func startView(name: String, url: String? = nil) {
+    let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "RUM", instrumentationVersion: MoboreIosSdkAgent.moboreSwiftAgentVersion)
+    let span = tracer.spanBuilder(spanName: "view.\(name)")
+      .setAttribute(key: "view.name", value: .string(name))
+      .setAttribute(key: "view.url", value: .string(url ?? "ios://\(Bundle.main.bundleIdentifier ?? "app")/\(name)"))
+      .startSpan()
+    OpenTelemetry.instance.contextProvider.setActiveSpan(span)
+  }
+
+  public static func endCurrentView() {
+    if let active = OpenTelemetry.instance.contextProvider.activeSpan {
+      active.end()
+      OpenTelemetry.instance.contextProvider.removeContextForSpan(active)
+    }
+  }
+
+  public static func forceFlush() {
+    MoboreSpanProcessor.forceFlushAll(timeout: 2.0)
+    MoboreLogRecordProcessor.forceFlushAll(explicitTimeout: 2.0)
+  }
+
+  public static func setUser(_ user: [String: String]) {
+    var attrs: [String: AttributeValue] = [:]
+    for (k, v) in user { attrs["user.\(k)"] = .string(v) }
+    GlobalAttributesStore.shared.setMany(attrs)
+  }
+
+  public static func addAction(name: String, type: String = "custom", attributes: [String: Any] = [:]) {
+    let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "RUM", instrumentationVersion: MoboreIosSdkAgent.moboreSwiftAgentVersion)
+    let builder = tracer.spanBuilder(spanName: "action.\(type).\(name)")
+    var attrs: [String: AttributeValue] = [
+      "action.name": .string(name),
+      "action.type": .string(type)
+    ]
+    attributes.forEach { key, value in
+      switch value {
+      case let v as String: attrs[key] = .string(v)
+      case let v as Bool: attrs[key] = .bool(v)
+      case let v as Double: attrs[key] = .double(v)
+      case let v as Int: attrs[key] = .int(v)
+      default: break
+      }
+    }
+    attrs.forEach { builder.setAttribute(key: $0.key, value: $0.value) }
+    let span = builder.startSpan()
+    span.end()
+  }
+
+  public static func addError(message: String, source: String? = nil, stack: String? = nil) {
+    let logger = OpenTelemetry.instance.loggerProvider.loggerBuilder(instrumentationScopeName: "RUM").setEventDomain("device").build()
+    var attrs: [String: AttributeValue] = [
+      SemanticAttributes.exceptionMessage.rawValue: .string(message)
+    ]
+    if let source { attrs["error.source"] = .string(source) }
+    if let stack { attrs[SemanticAttributes.exceptionStacktrace.rawValue] = .string(stack) }
+    logger.eventBuilder(name: SemanticAttributes.exception.rawValue)
+      .setSeverity(.error)
+      .setAttributes(attrs)
+      .emit()
+  }
+
+  public static func addTiming(name: String, durationMs: Double) {
+    let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "RUM", instrumentationVersion: MoboreIosSdkAgent.moboreSwiftAgentVersion)
+    let span = tracer.spanBuilder(spanName: "timing.\(name)")
+      .setAttribute(key: "timing.name", value: .string(name))
+      .setAttribute(key: "timing.duration", value: .double(durationMs))
+      .startSpan()
+    span.end()
+  }
+
+  public static func addGlobalAttribute(key: String, value: String) {
+    GlobalAttributesStore.shared.set(key: key, value: .string(value))
+  }
+
+  public static func addGlobalAttributes(_ attrs: [String: String]) {
+    var converted: [String: AttributeValue] = [:]
+    for (k, v) in attrs { converted[k] = .string(v) }
+    GlobalAttributesStore.shared.setMany(converted)
+  }
+
+  public static func removeGlobalAttribute(key: String) {
+    GlobalAttributesStore.shared.remove(key: key)
+  }
 }
