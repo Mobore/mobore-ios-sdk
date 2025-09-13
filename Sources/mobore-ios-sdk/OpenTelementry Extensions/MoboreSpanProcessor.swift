@@ -69,7 +69,11 @@ public struct MoboreSpanProcessor: SpanProcessor {
     parentContext: OpenTelemetryApi.SpanContext?, span: OpenTelemetrySdk.ReadableSpan
   ) {
 
-    span.setAttributes(attributeInterceptor.intercept(span.getAttributes()))
+    var attrs = attributeInterceptor.intercept(span.getAttributes())
+    // Merge global attributes
+    let globals = GlobalAttributesStore.shared.getAll()
+    for (k, v) in globals { attrs[k] = v }
+    span.setAttributes(attrs)
 
     // Track active span
     Self.activeSpansLock.lock()
