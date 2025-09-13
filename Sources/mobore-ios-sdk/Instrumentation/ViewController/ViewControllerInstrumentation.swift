@@ -91,7 +91,7 @@ internal class ViewControllerInstrumentation {
       // Fallback to class name to ensure SwiftUI container controllers are named
       title = String(describing: type(of: viewController)) + " - view appearing"
     }
-    return title
+    return "view.\(title)"
   }
 
   class ViewDidLoad: MethodSwizzler<
@@ -105,7 +105,7 @@ internal class ViewControllerInstrumentation {
     func swizzle() {
       swap { previousImplementation -> BlockSignature in { viewController in
 
-        let name = "\(type(of: viewController)) - view loading"
+        let name = "view.\(type(of: viewController)) - view loading"
         _ = ViewControllerInstrumentation
           .traceLogger
           .startTrace(tracer: ViewControllerInstrumentation.getTracer(),
@@ -133,7 +133,7 @@ internal class ViewControllerInstrumentation {
     func swizzle() {
       swap { previousImplementation -> BlockSignature in { viewController, animated in
 
-        let name = "\(type(of: viewController)) - view appearing"
+        let name = "view.\(type(of: viewController)) - view appearing"
 
         _ = ViewControllerInstrumentation
           .traceLogger
