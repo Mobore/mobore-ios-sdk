@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = "MoboreIosSdk"
-  spec.version      = "0.4.0"
+  spec.version      = "0.5.0"
   spec.summary      = "Mobore iOS SDK for Real User Monitoring"
   spec.description  = "A comprehensive iOS SDK for real user monitoring, crash reporting, and performance tracking."
   spec.homepage     = "https://github.com/mobore/mobore-ios-sdk"
