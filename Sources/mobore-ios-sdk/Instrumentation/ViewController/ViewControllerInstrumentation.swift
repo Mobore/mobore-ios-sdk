@@ -79,17 +79,17 @@ internal class ViewControllerInstrumentation {
 
   static func getViewControllerName(_ viewController: UIViewController) -> String? {
     if !VCNameOverrideStore.shared().name.isEmpty {
-      return VCNameOverrideStore.shared().name + " - view appearing"
+      return VCNameOverrideStore.shared().name
     }
     var title = viewController.navigationItem.title
 
     if let accessibiltyLabel = viewController.accessibilityLabel, !accessibiltyLabel.isEmpty {
-      title = "\(accessibiltyLabel) - view appearing"
+      title = "\(accessibiltyLabel)"
     } else if let navTitle = title {
-      title = "\(navTitle) - view appearing"
+      title = "\(navTitle)"
     } else {
       // Fallback to class name to ensure SwiftUI container controllers are named
-      title = String(describing: type(of: viewController)) + " - view appearing"
+      title = String(describing: type(of: viewController))
     }
     return "view.\(title)"
   }
@@ -133,7 +133,7 @@ internal class ViewControllerInstrumentation {
     func swizzle() {
       swap { previousImplementation -> BlockSignature in { viewController, animated in
 
-        let name = "view.\(type(of: viewController)) - view appearing"
+        let name = "view.\(type(of: viewController))"
 
         _ = ViewControllerInstrumentation
           .traceLogger
