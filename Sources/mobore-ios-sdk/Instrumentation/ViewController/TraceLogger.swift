@@ -42,7 +42,6 @@ class TraceLogger {
     if activeSpan == nil {
       let builder = tracer.spanBuilder(spanName: "\(name)")
         .setActive(true)
-        .setNoParent()
 
       let span = builder.startSpan()
       os_log("Started trace: %@ - %@ - %@",
