@@ -207,7 +207,7 @@ class AppMetrics: NSObject, MXMetricManagerSubscriber {
     }
   }
 
-  // Receive diagnostics immediately when available.
+  // TODO: Receive diagnostics immediately when available.
   @available(iOS 14.0, *)
   func didReceive(_ payloads: [MXDiagnosticPayload]) {
     // Process diagnostics.

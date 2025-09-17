@@ -56,6 +56,10 @@ public class MoboreIosSdkAgent {
 
   let crashConfig = CrashManagerConfiguration()
 
+  // Root session span to act as the parent for all app spans
+  private var rootSessionSpan: Span?
+  private var sessionObserver: NSObjectProtocol?
+
   private init(
     configuration: AgentConfiguration, instrumentationConfiguration: InstrumentationConfiguration
   ) {
@@ -93,6 +97,13 @@ public class MoboreIosSdkAgent {
 
     os_log("Initializing Mobore iOS SDK.")
 
+    // Start a root session span to parent all subsequent spans
+    startRootSessionIfNeeded()
+    // Observe session refresh to rotate the root session span
+    sessionObserver = NotificationCenter.default.addObserver(forName: .moboreSessionManagerDidRefreshSession, object: nil, queue: .main) { [weak self] _ in
+      self?.rotateRootSession()
+    }
+
     Task { @MainActor in
       instrumentation.initalize()
     }
@@ -118,6 +129,10 @@ public class MoboreIosSdkAgent {
 
   public static func endCurrentView() {
     if let active = OpenTelemetry.instance.contextProvider.activeSpan {
+      // Do not accidentally end the root session span
+      if let root = MoboreIosSdkAgent.shared()?.rootSessionSpan, (active as AnyObject) === (root as AnyObject) {
+        return
+      }
       active.end()
       OpenTelemetry.instance.contextProvider.removeContextForSpan(active)
     }
@@ -321,4 +336,31 @@ public class MoboreIosSdkAgent {
     }
   }
   #endif
+}
+
+// MARK: - Root session span helpers
+extension MoboreIosSdkAgent {
+  private func startRootSessionIfNeeded() {
+    guard rootSessionSpan == nil else { return }
+    let tracer = OpenTelemetry.instance.tracerProvider
+      .get(instrumentationName: "RUM", instrumentationVersion: MoboreIosSdkAgent.moboreSwiftAgentVersion)
+    let span = tracer
+      .spanBuilder(spanName: "mobile-session")
+      .setAttribute(key: MoboreAttributes.sessionId.rawValue, value: .string(SessionManager.instance.session(false)))
+      .startSpan()
+    OpenTelemetry.instance.contextProvider.setActiveSpan(span)
+    rootSessionSpan = span
+  }
+
+  private func rotateRootSession() {
+    // End previous root span
+    if let previous = rootSessionSpan {
+      previous.end()
+      if let active = OpenTelemetry.instance.contextProvider.activeSpan, (active as AnyObject) === (previous as AnyObject) {
+        OpenTelemetry.instance.contextProvider.removeContextForSpan(previous)
+      }
+    }
+    rootSessionSpan = nil
+    startRootSessionIfNeeded()
+  }
 }
