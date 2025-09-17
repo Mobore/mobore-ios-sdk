@@ -150,11 +150,7 @@ class TraceLogger {
       return overrideName
     }
 
-    if var name = preferredName, !name.isEmpty {
-      // Strip suffix used in logs to produce clean screen names
-      if let range = name.range(of: " - view appearing") {
-        name.removeSubrange(range)
-      }
+    if var name = preferredName, !name.isEmpty {    
       return name
     }
 

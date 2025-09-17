@@ -179,7 +179,7 @@ public class MoboreIosSdkAgent {
       .setEventDomain("app")
       .build()
 
-    var attrs: [String: AttributeValue] = []
+    var attrs: [String: AttributeValue] = [:]
     attributes.forEach { key, value in
       switch value {
       case let v as String: attrs[key] = .string(v)
@@ -299,7 +299,7 @@ public class MoboreIosSdkAgent {
         return
       }
       let tracer = ViewControllerInstrumentation.getTracer()
-      let defaultName = "\(type(of: vc)) - view appearing"
+      let defaultName = "\(type(of: vc))"
       let preferred = name ?? ViewControllerInstrumentation.getViewControllerName(vc)
       _ = ViewControllerInstrumentation
         .traceLogger
