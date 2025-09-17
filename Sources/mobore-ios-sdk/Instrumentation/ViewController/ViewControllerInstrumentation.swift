@@ -105,7 +105,7 @@ internal class ViewControllerInstrumentation {
     func swizzle() {
       swap { previousImplementation -> BlockSignature in { viewController in
 
-        let name = "view.\(type(of: viewController)) - view loading"
+        let name = "view.\(type(of: viewController))"
         _ = ViewControllerInstrumentation
           .traceLogger
           .startTrace(tracer: ViewControllerInstrumentation.getTracer(),
