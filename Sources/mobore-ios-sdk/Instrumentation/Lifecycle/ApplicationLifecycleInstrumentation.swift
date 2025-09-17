@@ -15,15 +15,13 @@ public class ApplicationLifecycleInstrumentation: NSObject {
         NotificationCenter.default.removeObserver(self)
     }
 
-    private static let logger: Logger = OpenTelemetry
+    private static let tracer: Tracer = OpenTelemetry
         .instance
-        .loggerProvider
-        .loggerBuilder(instrumentationScopeName: "ApplicationLifecycle")
-        .setEventDomain("device")
-        .build()
+        .tracerProvider
+        .get(instrumentationName: "ApplicationLifecycle", instrumentationVersion: "0.0.1")
 
-    static func getLogger() -> Logger {
-        logger
+    static func getTracer() -> Tracer {
+        tracer
     }
 
     public override init() {
@@ -56,33 +54,44 @@ public class ApplicationLifecycleInstrumentation: NSObject {
     }
 
     @objc func active(_ notification: Notification) {
-        Self.getLogger().eventBuilder(name: Self.eventName)
-            .setAttributes(["lifecycle.state": AttributeValue.string(State.active.rawValue)])
-            .emit()
+        let span = Self.getTracer()
+            .spanBuilder(spanName: Self.eventName)
+            .setAttribute(key: "lifecycle.state", value: .string(State.active.rawValue))
+            .startSpan()
+        span.end()
     }
 
     @objc func inactive(_ notification: Notification) {
-        Self.getLogger().eventBuilder(name: Self.eventName)
-            .setAttributes(["lifecycle.state": AttributeValue.string(State.inactive.rawValue)])
-            .emit()
+        let span = Self.getTracer()
+            .spanBuilder(spanName: Self.eventName)
+            .setAttribute(key: "lifecycle.state", value: .string(State.inactive.rawValue))
+            .startSpan()
+        span.end()
     }
 
     @objc func background(_ notification: Notification) {
-        Self.getLogger().eventBuilder(name: Self.eventName)
-            .setAttributes(["lifecycle.state": AttributeValue.string(State.background.rawValue)])
-            .emit()
+        let span = Self.getTracer()
+            .spanBuilder(spanName: Self.eventName)
+            .setAttribute(key: "lifecycle.state", value: .string(State.background.rawValue))
+            .startSpan()
+        span.end()
     }
 
     @objc func foreground(_ notification: Notification) {
-        Self.getLogger().eventBuilder(name: Self.eventName)
-            .setAttributes(["lifecycle.state": AttributeValue.string(State.foreground.rawValue)])
-            .emit()
+        let span = Self.getTracer()
+            .spanBuilder(spanName: Self.eventName)
+            .setAttribute(key: "lifecycle.state", value: .string(State.foreground.rawValue))
+            .startSpan()
+        span.end()
     }
 
     @objc func terminate(_ notification: Notification) {
-        Self.getLogger().eventBuilder(name: Self.eventName)
-            .setAttributes(["lifecycle.state": AttributeValue.string(State.terminate.rawValue)])
-            .emit()}
+        let span = Self.getTracer()
+            .spanBuilder(spanName: Self.eventName)
+            .setAttribute(key: "lifecycle.state", value: .string(State.terminate.rawValue))
+            .startSpan()
+        span.end()
+    }
 }
 
 #endif
