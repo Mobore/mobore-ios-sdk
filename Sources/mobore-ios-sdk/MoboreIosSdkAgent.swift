@@ -168,6 +168,48 @@ public class MoboreIosSdkAgent {
       .emit()
   }
 
+  /// Generic logging API backed by OpenTelemetry LoggerProvider
+  /// - Parameters:
+  ///   - message: Log message
+  ///   - level: one of trace, debug, info, warn, error, fatal (case-insensitive). Defaults to info
+  ///   - attributes: Additional structured attributes (String, Bool, Double, Int supported)
+  public static func addLog(message: String, level: String = "info", attributes: [String: Any] = [:]) {
+    let logger = OpenTelemetry.instance.loggerProvider
+      .loggerBuilder(instrumentationScopeName: "RUM")
+      .setEventDomain("app")
+      .build()
+
+    var attrs: [String: AttributeValue] = []
+    attributes.forEach { key, value in
+      switch value {
+      case let v as String: attrs[key] = .string(v)
+      case let v as Bool: attrs[key] = .bool(v)
+      case let v as Double: attrs[key] = .double(v)
+      case let v as Int: attrs[key] = .int(v)
+      default: break
+      }
+    }
+
+    logger
+      .eventBuilder(name: "log")
+      .setBody(AttributeValue.string(message))
+      .setSeverity(severity(from: level))
+      .setAttributes(attrs)
+      .emit()
+  }
+
+  private static func severity(from level: String) -> Severity {
+    switch level.lowercased() {
+    case "trace": return .trace
+    case "debug": return .debug
+    case "info": return .info
+    case "warn", "warning": return .warn
+    case "error": return .error
+    case "fatal", "critical": return .fatal
+    default: return .info
+    }
+  }
+
   public static func addTiming(name: String, durationMs: Double) {
     let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "RUM", instrumentationVersion: MoboreIosSdkAgent.moboreSwiftAgentVersion)
     let span = tracer.spanBuilder(spanName: "timing.\(name)")
