@@ -1,5 +1,5 @@
 import Foundation
 
 extension MoboreIosSdkAgent {
-    public static let moboreSwiftAgentVersion: String = "0.6.0"
+    public static let moboreSwiftAgentVersion: String = "0.6.1"
 }

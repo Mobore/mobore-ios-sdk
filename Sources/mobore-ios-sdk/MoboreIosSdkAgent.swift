@@ -59,6 +59,22 @@ public class MoboreIosSdkAgent {
   // Root session span to act as the parent for all app spans
   private var rootSessionSpan: Span?
   private var sessionObserver: NSObjectProtocol?
+  // Track current view span explicitly to avoid relying on thread-local context
+  private let viewSpanLock = NSLock()
+  private var currentViewSpan: Span?
+
+  private func setCurrentViewSpan(_ span: Span?) {
+    viewSpanLock.lock()
+    currentViewSpan = span
+    viewSpanLock.unlock()
+  }
+
+  private func getCurrentViewSpan() -> Span? {
+    viewSpanLock.lock()
+    let span = currentViewSpan
+    viewSpanLock.unlock()
+    return span
+  }
 
   private init(
     configuration: AgentConfiguration, instrumentationConfiguration: InstrumentationConfiguration
@@ -139,6 +155,10 @@ public class MoboreIosSdkAgent {
       .setAttribute(key: MoboreAttributes.sessionId.rawValue, value: .string(SessionManager.instance.session(false)))
       .startSpan()
     OpenTelemetry.instance.contextProvider.setActiveSpan(span)
+    // Also set active on main thread to ensure UI-driven calls see a parent
+    DispatchQueue.main.async {
+      OpenTelemetry.instance.contextProvider.setActiveSpan(span)
+    }
     rootSessionSpan = span
     os_log("Started root session span")
   }
@@ -165,11 +185,18 @@ public class MoboreIosSdkAgent {
       .setAttribute(key: "view.url", value: .string(url ?? "ios://\(Bundle.main.bundleIdentifier ?? "app")/\(name)"))
       .startSpan()
     OpenTelemetry.instance.contextProvider.setActiveSpan(span)
+    MoboreIosSdkAgent.shared()?.setCurrentViewSpan(span)
   }
 
   public static func endCurrentView() {
+    if let viewSpan = MoboreIosSdkAgent.shared()?.getCurrentViewSpan() {
+      viewSpan.end()
+      OpenTelemetry.instance.contextProvider.removeContextForSpan(viewSpan)
+      MoboreIosSdkAgent.shared()?.setCurrentViewSpan(nil)
+      return
+    }
+    // Fallback to active span if no explicit view span tracked
     if let active = OpenTelemetry.instance.contextProvider.activeSpan {
-      // Do not accidentally end the root session span
       if let root = MoboreIosSdkAgent.shared()?.rootSessionSpan, (active as AnyObject) === (root as AnyObject) {
         return
       }
@@ -290,19 +317,19 @@ public class MoboreIosSdkAgent {
 
   // View-scoped helpers
   public static func setViewAttribute(key: String, value: String) {
-    if let span = OpenTelemetry.instance.contextProvider.activeSpan {
+    if let span = MoboreIosSdkAgent.shared()?.getCurrentViewSpan() ?? OpenTelemetry.instance.contextProvider.activeSpan ?? MoboreIosSdkAgent.shared()?.rootSessionSpan {
       span.setAttribute(key: key, value: .string(value))
     }
   }
 
   public static func setViewAttributes(_ attrs: [String: String]) {
-    if let span = OpenTelemetry.instance.contextProvider.activeSpan {
+    if let span = MoboreIosSdkAgent.shared()?.getCurrentViewSpan() ?? OpenTelemetry.instance.contextProvider.activeSpan ?? MoboreIosSdkAgent.shared()?.rootSessionSpan {
       for (k, v) in attrs { span.setAttribute(key: k, value: .string(v)) }
     }
   }
 
   public static func addViewEvent(name: String, attributes: [String: Any]) {
-    if let span = OpenTelemetry.instance.contextProvider.activeSpan {
+    if let span = MoboreIosSdkAgent.shared()?.getCurrentViewSpan() ?? OpenTelemetry.instance.contextProvider.activeSpan ?? MoboreIosSdkAgent.shared()?.rootSessionSpan {
       var attrs: [String: AttributeValue] = [:]
       attributes.forEach { key, value in
         switch value {
@@ -356,12 +383,13 @@ public class MoboreIosSdkAgent {
       let tracer = ViewControllerInstrumentation.getTracer()
       let defaultName = "\(type(of: vc))"
       let preferred = name ?? ViewControllerInstrumentation.getViewControllerName(vc)
-      _ = ViewControllerInstrumentation
+      let span = ViewControllerInstrumentation
         .traceLogger
         .startTrace(tracer: tracer,
                     associatedObject: vc,
                     name: defaultName,
                     preferredName: preferred)
+      if let span { MoboreIosSdkAgent.shared()?.setCurrentViewSpan(span) }
     }
   }
 
@@ -373,6 +401,7 @@ public class MoboreIosSdkAgent {
         .traceLogger
         .stopTrace(associatedObject: vc ?? NSObject(),
                    preferredName: nil)
+      MoboreIosSdkAgent.shared()?.setCurrentViewSpan(nil)
     }
   }
   #endif
