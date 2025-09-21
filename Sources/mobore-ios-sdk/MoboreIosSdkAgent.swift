@@ -117,6 +117,10 @@ public class MoboreIosSdkAgent {
   }
 
   public static func endRootSessionNow() {
+    MoboreIosSdkAgent.shared()?.endRootSessionImmediately()
+  }
+
+  private func endRootSessionImmediately() {
     if let previous = rootSessionSpan {
       previous.end()
       if let active = OpenTelemetry.instance.contextProvider.activeSpan, (active as AnyObject) === (previous as AnyObject) {
@@ -126,19 +130,20 @@ public class MoboreIosSdkAgent {
     }
   }
 
-  private static func startRootSessionIfNeeded() {
+  private func startRootSessionIfNeeded() {
     guard rootSessionSpan == nil else { return }
     let tracer = OpenTelemetry.instance.tracerProvider
       .get(instrumentationName: "RUM", instrumentationVersion: MoboreIosSdkAgent.moboreSwiftAgentVersion)
     let span = tracer
       .spanBuilder(spanName: "mobile-session")
+      .setAttribute(key: MoboreAttributes.sessionId.rawValue, value: .string(SessionManager.instance.session(false)))
       .startSpan()
     OpenTelemetry.instance.contextProvider.setActiveSpan(span)
     rootSessionSpan = span
-    os_log("Starting root session span: %@", span.spanContext.spanId.hexString)
+    os_log("Started root session span")
   }
 
-  private static func rotateRootSession() {
+  private func rotateRootSession() {
     // End previous root span
     if let previous = rootSessionSpan {
       previous.end()
