@@ -100,7 +100,8 @@ public class MoboreIosSdkAgent {
     // Start a root session span to parent all subsequent spans
     startRootSessionIfNeeded()
     // Observe session refresh to rotate the root session span
-    sessionObserver = NotificationCenter.default.addObserver(forName: .moboreSessionManagerDidRefreshSession, object: nil, queue: .main) { [weak self] _ in
+    // Deliver synchronously on the posting thread to avoid races during exit flush
+    sessionObserver = NotificationCenter.default.addObserver(forName: .moboreSessionManagerDidRefreshSession, object: nil, queue: nil) { [weak self] _ in
       self?.rotateRootSession()
     }
 
@@ -113,6 +114,16 @@ public class MoboreIosSdkAgent {
       crashManager?.initializeCrashReporter(configuration: crashConfig)
     }
     #endif
+  }
+
+  public static func endRootSessionNow() {
+    if let previous = rootSessionSpan {
+      previous.end()
+      if let active = OpenTelemetry.instance.contextProvider.activeSpan, (active as AnyObject) === (previous as AnyObject) {
+        OpenTelemetry.instance.contextProvider.removeContextForSpan(previous)
+      }
+      rootSessionSpan = nil
+    }
   }
 
   private static func startRootSessionIfNeeded() {

@@ -53,7 +53,9 @@ final class ExitInstrumentation {
             shouldEndTask = backgroundTask != .invalid
         }
         #endif
-        // 1) End all spans
+        // 1) End root session span first to ensure it gets exported
+        MoboreIosSdkAgent.endRootSessionNow()
+        // Then end any remaining active spans
         MoboreSpanProcessor.endAllActiveSpans()
 
         // 2) Record exit event
