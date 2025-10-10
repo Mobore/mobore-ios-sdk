@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = "MoboreIosSdk"
-  spec.version      = "0.6.1"
+  spec.version      = "0.7.0"
   spec.summary      = "Mobore iOS SDK for Real User Monitoring"
   spec.description  = "A comprehensive iOS SDK for real user monitoring, crash reporting, and performance tracking."
   spec.homepage     = "https://github.com/mobore/mobore-ios-sdk"
@@ -27,12 +27,12 @@ Pod::Spec.new do |spec|
   spec.static_framework = true
 
   # OpenTelemetry dependencies
-  spec.dependency "OpenTelemetry-Swift-Sdk", "~> 2.1.0"
-  spec.dependency "OpenTelemetry-Swift-SdkResourceExtension", "~> 2.1.0"
-  spec.dependency "OpenTelemetry-Swift-PersistenceExporter", "~> 2.1.0"
-  spec.dependency "OpenTelemetry-Swift-Instrumentation-URLSession", "~> 2.1.0"
-  spec.dependency "OpenTelemetry-Swift-Protocol-Exporter-Http", "~> 2.1.0"
-  spec.dependency "OpenTelemetry-Swift-Instrumentation-NetworkStatus", "~> 2.1.0"
+  spec.dependency "OpenTelemetry-Swift-Sdk", "~> 2.2.0"
+  spec.dependency "OpenTelemetry-Swift-SdkResourceExtension", "~> 2.2.0"
+  spec.dependency "OpenTelemetry-Swift-PersistenceExporter", "~> 2.2.0"
+  spec.dependency "OpenTelemetry-Swift-Instrumentation-URLSession", "~> 2.2.0"
+  spec.dependency "OpenTelemetry-Swift-Protocol-Exporter-Http", "~> 2.2.0"
+  spec.dependency "OpenTelemetry-Swift-Instrumentation-NetworkStatus", "~> 2.2.0"
   # spec.dependency "OpenTelemetry-Swift-BaggagePropagationProcessor", "~> 2.1.0"
 
   # Other dependencies

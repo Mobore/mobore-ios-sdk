@@ -17,7 +17,7 @@ let package = Package(
   ],
   dependencies: [
     .package(
-      url: "https://github.com/open-telemetry/opentelemetry-swift", .upToNextMajor(from: "2.1.0")),
+      url: "https://github.com/open-telemetry/opentelemetry-swift", .upToNextMajor(from: "2.2.0")),
     .package(url: "https://github.com/MobileNativeFoundation/Kronos.git", .upToNextMajor(from: "4.2.2")),
     .package(
       url: "https://github.com/microsoft/plcrashreporter.git", .upToNextMajor(from: "1.12.0")),
