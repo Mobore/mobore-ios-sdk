@@ -17,6 +17,8 @@ public class InstrumentationConfigBuilder {
   var enableWebViewInstrumentation: Bool?
   var enableMetricsExport: Bool?
   var enableLogsExport: Bool?
+  var enableSessionUsageInstrumentation: Bool?
+  var sessionInactivityThresholdSeconds: Double?
   var urlSessionShouldInstrument: ((URLRequest) -> Bool)?
   var persistentStorageConfig: PersistencePerformancePreset?
   var urlSessionIgnoreSubstrings: [String]?
@@ -86,6 +88,16 @@ public class InstrumentationConfigBuilder {
 
   public func withWebViewInstrumentation(_ enable: Bool) -> Self {
     self.enableWebViewInstrumentation = enable
+    return self
+  }
+
+  public func withSessionUsageInstrumentation(_ enable: Bool) -> Self {
+    self.enableSessionUsageInstrumentation = enable
+    return self
+  }
+
+  public func withSessionInactivityThresholdSeconds(_ seconds: Double) -> Self {
+    self.sessionInactivityThresholdSeconds = seconds
     return self
   }
 
@@ -181,6 +193,14 @@ public class InstrumentationConfigBuilder {
 
     if let enableLogsExport = self.enableLogsExport {
       config.enableLogsExport = enableLogsExport
+    }
+
+    if let enableSessionUsageInstrumentation = self.enableSessionUsageInstrumentation {
+      config.enableSessionUsageInstrumentation = enableSessionUsageInstrumentation
+    }
+
+    if let sessionInactivityThresholdSeconds = self.sessionInactivityThresholdSeconds {
+      config.sessionInactivityThresholdSeconds = sessionInactivityThresholdSeconds
     }
 
     if let urlSessionShouldInstrument = self.urlSessionShouldInstrument {

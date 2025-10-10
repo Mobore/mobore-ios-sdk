@@ -16,6 +16,9 @@ public struct InstrumentationConfiguration {
   public var enableExitInstrumentation = true
   public var enablePushNotificationInstrumentation = true
   public var enableWebViewInstrumentation = true
+  // Track active usage/screen time with inactivity timeout
+  public var enableSessionUsageInstrumentation = true
+  public var sessionInactivityThresholdSeconds: Double = 90.0
   public var enableMetricsExport = false
   public var enableLogsExport = false
   // List of URL substrings; if a request URL starts with any of these, it will not be instrumented

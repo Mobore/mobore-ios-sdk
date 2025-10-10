@@ -14,10 +14,14 @@ public enum MoboreAttributes: String {
     case sessionId = "session.id"
 
     case serviceBuild = "service.build"
+
+    // Session active usage duration (milliseconds)
+    case sessionActiveDurationMs = "session.active_duration_ms"
 }
 
 public enum MoboreMetrics: String {
     case appLaunchTime = "application.launch.time"
     case appHangtime = "application.responsiveness.hangtime"
     case appExits = "application.exits"
+    case sessionActiveUsageSeconds = "session.active_usage.seconds"
 }

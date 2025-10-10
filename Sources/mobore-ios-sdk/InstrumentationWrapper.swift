@@ -20,6 +20,7 @@ class InstrumentationWrapper {
     #if os(iOS)
       var vcInstrumentation: ViewControllerInstrumentation?
       var applicationLifecycleInstrumentation: ApplicationLifecycleInstrumentation?
+      var sessionUsageInstrumentation: SessionUsageInstrumentation?
     #endif
     #if os(iOS) && !targetEnvironment(macCatalyst)
       var netstatInjector: NetworkStatusInjector?
@@ -92,6 +93,11 @@ class InstrumentationWrapper {
       }
       #endif
       #if os(iOS)
+        if config.instrumentation.enableSessionUsageInstrumentation {
+            let threshold = max(0.0, config.instrumentation.sessionInactivityThresholdSeconds)
+            sessionUsageInstrumentation = SessionUsageInstrumentation(inactivityThreshold: threshold)
+            sessionUsageInstrumentation?.start()
+        }
         vcInstrumentation?.swizzle()
       #endif // os(iOS)
     }

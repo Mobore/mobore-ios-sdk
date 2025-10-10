@@ -311,6 +311,18 @@ public class MoboreIosSdkAgent {
     GlobalAttributesStore.shared.setMany(converted)
   }
 
+  /// Sets a key/value attribute on the current root session span if available.
+  /// Safe to call from background threads; attribute will be applied to root session span.
+  public static func setSessionAttribute(key: String, valueMs: Double) {
+    if let span = MoboreIosSdkAgent.shared()?.rootSessionSpan {
+      span.setAttribute(key: key, value: .double(valueMs))
+      return
+    }
+    if let active = OpenTelemetry.instance.contextProvider.activeSpan {
+      active.setAttribute(key: key, value: .double(valueMs))
+    }
+  }
+
   public static func removeGlobalAttribute(key: String) {
     GlobalAttributesStore.shared.remove(key: key)
   }
