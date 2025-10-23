@@ -101,7 +101,8 @@ class OpenTelemetryInitializer {
             selector: InstrumentSelector.builder().setInstrument(name: ".*").build(),
             view: View.builder().build()
           )
-          // TODO WITH RESOURCE and myabe clock
+          .with(resource: resources)
+          .with(clock: NTPClock())
           .registerMetricReader(
             reader: PeriodicMetricReaderBuilder(
               exporter: metricExporter
