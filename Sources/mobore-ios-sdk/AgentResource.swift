@@ -82,7 +82,7 @@ public class AgentResource {
 
     // network.* attributes - get current network connection type
 #if os(iOS) && !targetEnvironment(macCatalyst)
-    let networkStatus = NetworkStatusManager().status()
+    let networkStatus = (try? NetworkStatus())?.status().0 ?? "unavailable"
     overridingAttributes["network.connection.type"] = AttributeValue.string(networkStatus)
 #else
     overridingAttributes["network.connection.type"] = AttributeValue.string("unknown")

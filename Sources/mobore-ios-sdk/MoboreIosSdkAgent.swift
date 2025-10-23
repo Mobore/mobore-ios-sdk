@@ -81,7 +81,7 @@ public class MoboreIosSdkAgent {
   ) {
     crashConfig.sessionId = SessionManager.instance.session(false)
     #if os(iOS) && !targetEnvironment(macCatalyst)
-      crashConfig.networkStatus = NetworkStatusManager().lastStatus
+      crashConfig.networkStatus = (try? NetworkStatus())?.status().0
     #endif // os(iOS) && !targetEnvironment(macCatalyst)
 
     crashConfig.allowWhenDebuggerAttached = instrumentationConfiguration.enableCrashReportingInDebugMode

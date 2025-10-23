@@ -21,8 +21,8 @@ public struct MoboreLogRecordProcessor: LogRecordProcessor {
       .join { attributes in
           var newAttributes = attributes
           #if os(iOS) && !targetEnvironment(macCatalyst)
-          newAttributes[SemanticAttributes.networkConnectionType.rawValue] = AttributeValue
-            .string(NetworkStatusManager().status())
+          let status = (try? NetworkStatus())?.status().0 ?? "unavailable"
+          newAttributes[SemanticAttributes.networkConnectionType.rawValue] = .string(status)
           #endif // os(iOS) && !targetEnvironment(macCatalyst)
           return newAttributes
         }

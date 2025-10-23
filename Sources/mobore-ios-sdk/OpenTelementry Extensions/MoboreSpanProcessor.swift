@@ -84,9 +84,9 @@ public struct MoboreSpanProcessor: SpanProcessor {
     if span.isHttpSpan(), let networkStatusInjector = Self.netstatInjector {
       networkStatusInjector.inject(span: span)
     } else {
-      span
-        .setAttribute(key: SemanticAttributes.networkConnectionType.rawValue,
-                      value: .string(NetworkStatusManager().status()))
+      let status = (try? NetworkStatus())?.status().0 ?? "unavailable"
+      span.setAttribute(key: SemanticAttributes.networkConnectionType.rawValue,
+                        value: .string(status))
     }
     #endif
     processor.onStart(parentContext: parentContext, span: span)
