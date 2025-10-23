@@ -1,10 +1,10 @@
 Pod::Spec.new do |spec|
   spec.name         = "MoboreIosSdk"
-  spec.version      = "0.7.1"
+  spec.version      = "0.7.2"
   spec.summary      = "Mobore iOS SDK for Real User Monitoring"
   spec.description  = "A comprehensive iOS SDK for real user monitoring, crash reporting, and performance tracking."
   spec.homepage     = "https://github.com/mobore/mobore-ios-sdk"
-  spec.license      = { :type => "Commercial", :text => "Copyright 2025 Mobore.com" }
+  spec.license      = "Apache-2.0"
   spec.author       = { "Mobore" => "team@mobore.com" }
   spec.documentation_url = "https://docs.mobore.com"
   spec.platform = :ios, '16.0'
@@ -20,6 +20,7 @@ Pod::Spec.new do |spec|
   
   spec.source           = { :git => "https://github.com/mobore/mobore-ios-sdk.git", :tag => spec.version.to_s }
   spec.source_files = "Sources/mobore-ios-sdk/**/*.{swift,h,m}"
+  spec.preserve_paths = ["README.md"]
   spec.resource_bundles = {
     'MoboreIosSdk' => ['Sources/mobore-ios-sdk/Resources/**/*']
   }
