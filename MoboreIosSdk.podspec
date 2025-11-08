@@ -7,10 +7,13 @@ Pod::Spec.new do |spec|
   spec.license      = "Apache-2.0"
   spec.author       = { "Mobore" => "team@mobore.com" }
   spec.documentation_url = "https://docs.mobore.com"
-  spec.platform = :ios, '16.0'
-  spec.ios.deployment_target          = "16.0"
 
-  spec.swift_version = '5.10'
+  spec.swift_version = "5.10"
+  spec.osx.deployment_target  = "10.13"
+  spec.ios.deployment_target = "12.0"
+  spec.tvos.deployment_target = "12.0"
+  spec.watchos.deployment_target = "4.0"
+
   spec.pod_target_xcconfig = {
     'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386 x86_64'
   }
@@ -28,12 +31,12 @@ Pod::Spec.new do |spec|
   spec.static_framework = true
 
   # OpenTelemetry dependencies
-  spec.dependency "OpenTelemetry-Swift-Sdk", "~> 2.2.0"
-  spec.dependency "OpenTelemetry-Swift-SdkResourceExtension", "~> 2.2.0"
-  spec.dependency "OpenTelemetry-Swift-PersistenceExporter", "~> 2.2.0"
-  spec.dependency "OpenTelemetry-Swift-Instrumentation-URLSession", "~> 2.2.0"
-  spec.dependency "OpenTelemetry-Swift-Protocol-Exporter-Http", "~> 2.2.0"
-  spec.dependency "OpenTelemetry-Swift-Instrumentation-NetworkStatus", "~> 2.2.0"
+  spec.dependency "OpenTelemetry-Swift-Sdk", "~> 2.2.1"
+  spec.dependency "OpenTelemetry-Swift-SdkResourceExtension", "~> 2.2.1"
+  spec.dependency "OpenTelemetry-Swift-PersistenceExporter", "~> 2.2.1"
+  spec.dependency "OpenTelemetry-Swift-Instrumentation-URLSession", "~> 2.2.1"
+  spec.dependency "OpenTelemetry-Swift-Protocol-Exporter-Http", "~> 2.2.1"
+  spec.dependency "OpenTelemetry-Swift-Instrumentation-NetworkStatus", "~> 2.2.1"
   # spec.dependency "OpenTelemetry-Swift-BaggagePropagationProcessor", "~> 2.1.0"
 
   # Other dependencies

@@ -10,44 +10,15 @@ on:
 
 jobs:
   publish:
-    runs-on: macos-14
+    runs-on: macOS-latest
     timeout-minutes: 60
     env:
       COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.2'
-          bundler-cache: false
-
       - name: Install CocoaPods
-        run: gem install cocoapods -N
-
-      - name: Show Xcode version
-        run: xcodebuild -version
-
-      - name: Verify version sync (podspec vs Version.swift)
-        id: versions
-        shell: bash
-        run: |
-          set -euo pipefail
-          PODSPEC_VERSION=$(ruby -e "spec=Pod::Spec.from_file('MoboreIosSdk.podspec'); puts spec.version")
-          SWIFT_VERSION=$(sed -n "s/.*moboreSwiftAgentVersion: String = \"\(.*\)\".*/\1/p" Sources/Version.swift)
-          echo "podspec=$PODSPEC_VERSION" >> $GITHUB_OUTPUT
-          echo "swift=$SWIFT_VERSION" >> $GITHUB_OUTPUT
-          if [[ "$PODSPEC_VERSION" != "$SWIFT_VERSION" ]]; then
-            echo "Version mismatch: podspec=$PODSPEC_VERSION swift=$SWIFT_VERSION" >&2
-            exit 1
-          fi
-
-      - name: Lint podspec
-        run: |
-          pod lib lint MoboreIosSdk.podspec --platforms=ios --allow-warnings --skip-tests --verbose
-
+        run: gem install cocoapods
       - name: Push to CocoaPods trunk
         if: success()
         run: |

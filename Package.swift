@@ -6,10 +6,10 @@ import PackageDescription
 let package = Package(
   name: "mobore-ios-sdk",
   platforms: [
-    .iOS(.v16),
-    .macOS(.v13),
-    .tvOS(.v16),
-    .watchOS(.v10),
+    .iOS(.v12),
+    .macOS(.v10_13),
+    .tvOS(.v12),
+    .watchOS(.v4),
   ],
   products: [
     // Products define the executables and libraries a package produces, and make them visible to other package.
@@ -17,7 +17,7 @@ let package = Package(
   ],
   dependencies: [
     .package(
-      url: "https://github.com/open-telemetry/opentelemetry-swift", .upToNextMajor(from: "2.2.0")),
+      url: "https://github.com/open-telemetry/opentelemetry-swift", .upToNextMajor(from: "2.2.1")),
     .package(url: "https://github.com/MobileNativeFoundation/Kronos.git", .upToNextMajor(from: "4.2.2")),
     .package(
       url: "https://github.com/microsoft/plcrashreporter.git", .upToNextMajor(from: "1.12.0")),
