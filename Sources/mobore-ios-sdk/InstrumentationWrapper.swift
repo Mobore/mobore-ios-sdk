@@ -1,5 +1,5 @@
 import Foundation
-import URLSession
+import URLSessionInstrumentation
 import NetworkStatus
 import OpenTelemetryApi
 

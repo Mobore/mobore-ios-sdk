@@ -6,10 +6,10 @@ import PackageDescription
 let package = Package(
   name: "mobore-ios-sdk",
   platforms: [
-    .iOS(.v12),
-    .macOS(.v10_13),
-    .tvOS(.v12),
-    .watchOS(.v4),
+    .iOS(.v16),
+    .macOS(.v13),
+    .tvOS(.v16),
+    .watchOS(.v10),
   ],
   products: [
     // Products define the executables and libraries a package produces, and make them visible to other package.

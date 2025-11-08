@@ -1,4 +1,5 @@
 import Foundation
+import NetworkStatus
 import OpenTelemetryApi
 import OpenTelemetrySdk
 

@@ -9,10 +9,11 @@ Pod::Spec.new do |spec|
   spec.documentation_url = "https://docs.mobore.com"
 
   spec.swift_version = "5.10"
-  spec.osx.deployment_target  = "10.13"
-  spec.ios.deployment_target = "12.0"
-  spec.tvos.deployment_target = "12.0"
-  spec.watchos.deployment_target = "4.0"
+  spec.ios.deployment_target = "16.0"
+  spec.tvos.deployment_target = "16.0"
+  spec.watchos.deployment_target = "10.0"
+  spec.visionos.deployment_target = "16.0"
+  spec.osx.deployment_target = "13.0"
 
   spec.pod_target_xcconfig = {
     'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386 x86_64'
