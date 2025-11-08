@@ -32,7 +32,7 @@ Pod::Spec.new do |spec|
   spec.static_framework = true
 
   # OpenTelemetry dependencies
-  spec.dependency "OpenTelemetry-Swift-Sdk", "~> 2.2.1"
+  spec.dependency "OpenTelemetry-Swift-Sdk", "~> 2.3.0"
   spec.dependency "OpenTelemetry-Swift-SdkResourceExtension", "~> 2.2.1"
   spec.dependency "OpenTelemetry-Swift-PersistenceExporter", "~> 2.2.1"
   spec.dependency "OpenTelemetry-Swift-Instrumentation-URLSession", "~> 2.2.1"
