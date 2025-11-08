@@ -16,8 +16,9 @@ final class SessionUsageInstrumentation: NSObject {
   private let meter: any Meter = OpenTelemetry.instance.meterProvider
     .meterBuilder(name: "SessionUsage")
     .build()
-  private lazy var counter: any Counter = meter
+  private lazy var counter: any DoubleCounter = meter
     .counterBuilder(name: MoboreMetrics.sessionActiveUsageSeconds.rawValue)
+    .ofDoubles()
     .build()
 
   init(inactivityThreshold: TimeInterval) {
@@ -67,7 +68,7 @@ final class SessionUsageInstrumentation: NSObject {
   private func accumulate(seconds: Double) {
     totalActiveMs += seconds * 1000.0
     let sessionId = SessionManager.instance.session(false)
-    counter.add(value: seconds, attributes: [MoboreAttributes.sessionId.rawValue: .string(sessionId)])
+      counter.add(value: seconds, attributes: [MoboreAttributes.sessionId.rawValue: .string(sessionId)])
     MoboreIosSdkAgent.setSessionAttribute(key: MoboreAttributes.sessionActiveDurationMs.rawValue, valueMs: totalActiveMs)
   }
 

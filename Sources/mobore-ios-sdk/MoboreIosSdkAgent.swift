@@ -10,6 +10,7 @@ import os.log
 #if os(iOS)
 import UIKit
 #endif
+import NetworkStatus
 
 public class MoboreIosSdkAgent {
  public static let name = "mobore-ios-sdk"

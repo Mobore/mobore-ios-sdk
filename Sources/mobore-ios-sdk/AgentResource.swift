@@ -9,6 +9,7 @@ import UIKit
 import ResourceExtension
 import OpenTelemetryApi
 import OpenTelemetrySdk
+import NetworkStatus
 
 public class AgentResource {
   public static func get(environment: String? = nil) -> Resource {

@@ -67,7 +67,7 @@ class OpenTelemetryInitializer {
         if let path = Self.createPersistenceFolder() {
           return try PersistenceMetricExporterDecorator(
             metricExporter: defaultExporter, storageURL: path, exportCondition: { true },
-            performancePreset: PersistencePerformancePreset.default) as MetricExporter
+            performancePreset: PersistencePerformancePreset.balanced) as MetricExporter
         }
       } catch {}
       return defaultExporter as MetricExporter
@@ -81,7 +81,7 @@ class OpenTelemetryInitializer {
           return try PersistenceSpanExporterDecorator(
             spanExporter: defaultExporter,
             storageURL: path, exportCondition: { true },
-            performancePreset: PersistencePerformancePreset.default) as SpanExporter
+            performancePreset: PersistencePerformancePreset.balanced) as SpanExporter
         }
       } catch {}
       return defaultExporter as SpanExporter
@@ -90,27 +90,36 @@ class OpenTelemetryInitializer {
     let logExporter = {
       let logsEndpoint = URL(string: endpoint.absoluteString + "/v1/logs")
       let defaultExporter = OtlpHttpLogExporter(endpoint: logsEndpoint ?? endpoint, config: otlpConfiguration)
+        do {
+          if let path = Self.createPersistenceFolder() {
+            return try PersistenceLogExporterDecorator(
+                logRecordExporter: defaultExporter,
+              storageURL: path, exportCondition: { true },
+              performancePreset: PersistencePerformancePreset.balanced) as LogRecordExporter
+          }
+        } catch {}
       return defaultExporter as LogRecordExporter
     }()
 
     if configuration.instrumentation.enableMetricsExport {
-
+        
+        
+        let meterProviderBuilder = MeterProviderSdk.builder()
+        .registerView(
+          selector: InstrumentSelector.builder().setInstrument(name: ".*").build(),
+          view: View.builder().build()
+        )
+        .setResource(resource: resources)
+        .setClock(clock: NTPClock())
+        .registerMetricReader(
+          reader: PeriodicMetricReaderBuilder(
+            exporter: metricExporter
+          )
+          .build()
+        )
       OpenTelemetry.registerMeterProvider(
-        meterProvider: MeterProviderSdk.builder()
-          .registerView(
-            selector: InstrumentSelector.builder().setInstrument(name: ".*").build(),
-            view: View.builder().build()
-          )
-          .with(resource: resources)
-          .with(clock: NTPClock())
-          .registerMetricReader(
-            reader: PeriodicMetricReaderBuilder(
-              exporter: metricExporter
-            )
-            .build()
-          )
-            .build()
-          )
+        meterProvider: meterProviderBuilder.build()
+      )
     }
 
     // initialize trace provider
@@ -140,25 +149,25 @@ class OpenTelemetryInitializer {
     return logExporter
   }
 }
-//
-//extension PersistencePerformancePreset {
-//    /// A custom preset offering a balance between performance and timely data delivery.
-//    static let balanced = PersistencePerformancePreset(
-//        // Storage settings
-//        maxFileSize: 10 * 1_024 * 1_024, // 10MB
-//        maxDirectorySize: 256 * 1_024 * 1_024, // 256MB
-//        maxFileAgeForWrite: 4.75,
-//        minFileAgeForRead: 4.75 + 0.5, // `maxFileAgeForWrite` + 0.5s margin
-//        maxFileAgeForRead: 24 * 60 * 60, // 24h
-//        maxObjectsInFile: 500,
-//        maxObjectSize: 2 * 1_024 * 1_024, // 2MB
-//        synchronousWrite: false,
-//
-//        // Export settings
-//        initialExportDelay: 5, // postpone to not impact app launch time
-//        defaultExportDelay: 5,
-//        minExportDelay: 1,
-//        maxExportDelay: 20,
-//        exportDelayChangeRate: 0.1
-//    )
-//}
+
+extension PersistencePerformancePreset {
+   /// A custom preset offering a balance between performance and timely data delivery.
+   static let balanced = PersistencePerformancePreset(
+       // Storage settings
+       maxFileSize: 10 * 1_024 * 1_024, 
+       maxDirectorySize: 256 * 1_024 * 1_024, 
+       maxFileAgeForWrite: 4.75,
+       minFileAgeForRead: 4.75 + 0.5,
+       maxFileAgeForRead: 24 * 60 * 60, // 24h
+       maxObjectsInFile: 500,
+       maxObjectSize: 5 * 1_024 * 1_024, 
+       synchronousWrite: false,
+
+       // Export settings
+       initialExportDelay: 5, // postpone to not impact app launch time
+       defaultExportDelay: 5,
+       minExportDelay: 1,
+       maxExportDelay: 20,
+       exportDelayChangeRate: 0.1
+   )
+}
