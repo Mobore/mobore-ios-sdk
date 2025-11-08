@@ -10,10 +10,7 @@ Pod::Spec.new do |spec|
 
   spec.swift_version = "5.10"
   spec.ios.deployment_target = "16.0"
-  spec.tvos.deployment_target = "16.0"
-  spec.watchos.deployment_target = "10.0"
-  spec.visionos.deployment_target = "16.0"
-  spec.osx.deployment_target = "13.0"
+  # Limit to iOS only to avoid incompatible transitive pods on other platforms
 
   spec.pod_target_xcconfig = {
     'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386 x86_64'

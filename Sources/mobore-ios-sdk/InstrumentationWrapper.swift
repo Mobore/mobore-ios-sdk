@@ -1,6 +1,18 @@
 import Foundation
+#if canImport(URLSessionInstrumentation)
 import URLSessionInstrumentation
+public typealias OTURLSessionInstrumentation = URLSessionInstrumentation
+public typealias OTURLSessionInstrumentationConfiguration = URLSessionInstrumentationConfiguration
+#elseif canImport(OpenTelemetryInstrumentationURLSession)
+import OpenTelemetryInstrumentationURLSession
+public typealias OTURLSessionInstrumentation = OpenTelemetryInstrumentationURLSession.URLSessionInstrumentation
+public typealias OTURLSessionInstrumentationConfiguration = OpenTelemetryInstrumentationURLSession.URLSessionInstrumentationConfiguration
+#endif
+#if canImport(NetworkStatus)
 import NetworkStatus
+#elseif canImport(OpenTelemetryInstrumentationNetworkStatus)
+import OpenTelemetryInstrumentationNetworkStatus
+#endif
 import OpenTelemetryApi
 
 class InstrumentationWrapper {
@@ -25,8 +37,9 @@ class InstrumentationWrapper {
     #if os(iOS) && !targetEnvironment(macCatalyst)
       var netstatInjector: NetworkStatusInjector?
     #endif
-  
-    var urlSessionInstrumentation: URLSessionInstrumentation?
+    #if canImport(URLSessionInstrumentation) || canImport(OpenTelemetryInstrumentationURLSession)
+    var urlSessionInstrumentation: OTURLSessionInstrumentation?
+    #endif
     let config: AgentConfigManager
 
     init(config: AgentConfigManager) {
@@ -61,9 +74,11 @@ class InstrumentationWrapper {
             }
         }
       #endif
-      if config.instrumentation.enableURLSessionInstrumentation {
-          initializeNetworkInstrumentation()
-      }
+      #if canImport(URLSessionInstrumentation) || canImport(OpenTelemetryInstrumentationURLSession)
+        if config.instrumentation.enableURLSessionInstrumentation {
+            initializeNetworkInstrumentation()
+        }
+      #endif
       if config.instrumentation.enableHangInstrumentation {
           hangInstrumentation = HangInstrumentation()
           hangInstrumentation?.start()
@@ -104,12 +119,14 @@ class InstrumentationWrapper {
 
     private func initializeNetworkInstrumentation() {
       #if os(iOS) && !targetEnvironment(macCatalyst)
+      #if canImport(NetworkStatus) || canImport(OpenTelemetryInstrumentationNetworkStatus)
         do {
             let netstats =  try NetworkStatus()
             netstatInjector = NetworkStatusInjector(netstat: netstats)
         } catch {
             print("failed to initialize network connection status \(error)")
         }
+      #endif
       #endif
 
       // Build ignore list (prefix and regex) and default-exporter exclusions
@@ -124,7 +141,8 @@ class InstrumentationWrapper {
         try? NSRegularExpression(pattern: pattern)
       }
 
-      var config = URLSessionInstrumentationConfiguration(shouldRecordPayload: nil,
+      #if canImport(URLSessionInstrumentation) || canImport(OpenTelemetryInstrumentationURLSession)
+      var urlConfig = OTURLSessionInstrumentationConfiguration(shouldRecordPayload: nil,
                                                           shouldInstrument:  { [weak self] request in
           guard let self else { return true }
           let urlString = request.url?.absoluteString ?? ""
@@ -191,6 +209,7 @@ class InstrumentationWrapper {
           // swiftlint:enable line_length
         })
 
-        urlSessionInstrumentation = URLSessionInstrumentation(configuration: config)
+        urlSessionInstrumentation = OTURLSessionInstrumentation(configuration: urlConfig)
+      #endif
     }
 }
