@@ -19,8 +19,6 @@ public struct MoboreInstrumentationConfiguration {
   // Track active usage/screen time with inactivity timeout
   public var enableSessionUsageInstrumentation = true
   public var sessionInactivityThresholdSeconds: Double = 90.0
-  public var enableMetricsExport = false
-  public var enableLogsExport = false
   // List of URL substrings; if a request URL starts with any of these, it will not be instrumented
   public var urlSessionIgnoreSubstrings: [String] = []
   // List of regular expression patterns (as strings). If any pattern matches a request URL, it will not be instrumented

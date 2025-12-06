@@ -101,26 +101,22 @@ class MoboreOpenTelemetryInitializer {
       return defaultExporter as LogRecordExporter
     }()
 
-    if configuration.instrumentation.enableMetricsExport {
-        
-        
-        let meterProviderBuilder = MeterProviderSdk.builder()
-        .registerView(
-          selector: InstrumentSelector.builder().setInstrument(name: ".*").build(),
-          view: View.builder().build()
-        )
-        .setResource(resource: resources)
-        .setClock(clock: MoboreNTPClock())
-        .registerMetricReader(
-          reader: PeriodicMetricReaderBuilder(
-            exporter: metricExporter
-          )
-          .build()
-        )
-      OpenTelemetry.registerMeterProvider(
-        meterProvider: meterProviderBuilder.build()
+    let meterProviderBuilder = MeterProviderSdk.builder()
+      .registerView(
+        selector: InstrumentSelector.builder().setInstrument(name: ".*").build(),
+        view: View.builder().build()
       )
-    }
+      .setResource(resource: resources)
+      .setClock(clock: MoboreNTPClock())
+      .registerMetricReader(
+        reader: PeriodicMetricReaderBuilder(
+          exporter: metricExporter
+        )
+        .build()
+      )
+    OpenTelemetry.registerMeterProvider(
+      meterProvider: meterProviderBuilder.build()
+    )
 
     // initialize trace provider
     OpenTelemetry.registerTracerProvider(
@@ -134,18 +130,16 @@ class MoboreOpenTelemetryInitializer {
         .with(clock: MoboreNTPClock())
         .build())
 
-    if configuration.instrumentation.enableLogsExport {
-      OpenTelemetry.registerLoggerProvider(
-        loggerProvider: LoggerProviderBuilder()
-          .with(clock: MoboreNTPClock())
-          .with(resource: resources)
-          .with(processors: [
-            MoboreLogRecordProcessor(
-              logRecordExporter: logExporter,
-              configuration: configuration.agent)
-          ])
-          .build())
-    }
+    OpenTelemetry.registerLoggerProvider(
+      loggerProvider: LoggerProviderBuilder()
+        .with(clock: MoboreNTPClock())
+        .with(resource: resources)
+        .with(processors: [
+          MoboreLogRecordProcessor(
+            logRecordExporter: logExporter,
+            configuration: configuration.agent)
+        ])
+        .build())
     return logExporter
   }
 }

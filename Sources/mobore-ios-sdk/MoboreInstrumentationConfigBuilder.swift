@@ -15,8 +15,6 @@ public class MoboreInstrumentationConfigBuilder {
   var enableExitInstrumentation: Bool?
   var enablePushNotificationInstrumentation: Bool?
   var enableWebViewInstrumentation: Bool?
-  var enableMetricsExport: Bool?
-  var enableLogsExport: Bool?
   var enableSessionUsageInstrumentation: Bool?
   var sessionInactivityThresholdSeconds: Double?
   var urlSessionShouldInstrument: ((URLRequest) -> Bool)?
@@ -101,16 +99,6 @@ public class MoboreInstrumentationConfigBuilder {
     return self
   }
 
-  public func withMetricsExport(_ enable: Bool) -> Self {
-    self.enableMetricsExport = enable
-    return self
-  }
-
-  public func withLogsExport(_ enable: Bool) -> Self {
-    self.enableLogsExport = enable
-    return self
-  }
-
   public func withURLSessionShouldInstrument(_ shouldInstrument: @escaping (URLRequest) -> Bool) -> Self {
     self.urlSessionShouldInstrument = shouldInstrument
     return self
@@ -185,14 +173,6 @@ public class MoboreInstrumentationConfigBuilder {
 
     if let enableWebViewInstrumentation = self.enableWebViewInstrumentation {
       config.enableWebViewInstrumentation = enableWebViewInstrumentation
-    }
-
-    if let enableMetricsExport = self.enableMetricsExport {
-      config.enableMetricsExport = enableMetricsExport
-    }
-
-    if let enableLogsExport = self.enableLogsExport {
-      config.enableLogsExport = enableLogsExport
     }
 
     if let enableSessionUsageInstrumentation = self.enableSessionUsageInstrumentation {
