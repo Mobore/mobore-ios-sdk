@@ -309,7 +309,7 @@ public class MoboreIosSdkAgent {
   public static func addGlobalAttributes(_ attrs: [String: String]) {
     var converted: [String: AttributeValue] = [:]
     for (k, v) in attrs { converted[k] = .string(v) }
-    GlobalAttributesStore.shared.setMany(converted)
+    MoboreGlobalAttributesStore.shared.setMany(converted)
   }
 
   /// Sets a key/value attribute on the current root session span if available.

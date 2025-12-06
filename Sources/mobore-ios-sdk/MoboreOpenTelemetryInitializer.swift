@@ -131,13 +131,13 @@ class MoboreOpenTelemetryInitializer {
         )
         .with(sampler: sessionSampler as Sampler)
         .with(resource: resources)
-        .with(clock: NTPClock())
+        .with(clock: MoboreNTPClock())
         .build())
 
     if configuration.instrumentation.enableLogsExport {
       OpenTelemetry.registerLoggerProvider(
         loggerProvider: LoggerProviderBuilder()
-          .with(clock: NTPClock())
+          .with(clock: MoboreNTPClock())
           .with(resource: resources)
           .with(processors: [
             MoboreLogRecordProcessor(
