@@ -2,7 +2,7 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 
-public class AgentConfigBuilder {
+public class MoboreAgentConfigBuilder {
   private var enableAgent: Bool?
   private var exportUrl: URL?
   private var environment: String?
@@ -64,9 +64,9 @@ public class AgentConfigBuilder {
     return self
   }
 
-  public func build() -> AgentConfiguration {
+  public func build() -> MoboreAgentConfiguration {
 
-    var config = AgentConfiguration()
+    var config = MoboreAgentConfiguration()
     config.sampleRate = sampleRate
     config.logFilters = logFilters
     config.spanFilters = spanFilters

@@ -17,12 +17,12 @@ private extension NSLock {
 @available(iOS 13.0, *)
 public extension SwiftUICore.View {
   func reportName(_ name: String) -> Self {
-    VCNameOverrideStore.shared().name = name
+    MoboreVCNameOverrideStore.shared().name = name
     return self
   }
 }
 
-internal class VCNameOverrideStore {
+internal class MoboreVCNameOverrideStore {
   let nameLock = NSLock()
   private var _name = ""
   public var name: String {
@@ -39,19 +39,19 @@ internal class VCNameOverrideStore {
       }
     }
   }
-  static var instance = VCNameOverrideStore()
+  static var instance = MoboreVCNameOverrideStore()
   private init() {
   }
 
-  static func shared() -> VCNameOverrideStore {
+  static func shared() -> MoboreVCNameOverrideStore {
     return instance
   }
 }
 
-internal class ViewControllerInstrumentation {
+internal class MoboreViewControllerInstrumentation {
   static let logger = OSLog(subsystem: "com.mobore.viewControllerInstrumentation", category: "Instrumentation")
   var activeSpan: Span?
-  static let traceLogger = TraceLogger()
+  static let traceLogger = MoboreTraceLogger()
   let viewDidLoad: ViewDidLoad
   let viewWillAppear: ViewWillAppear
   let viewDidAppear: ViewDidAppear
@@ -63,7 +63,7 @@ internal class ViewControllerInstrumentation {
   }
 
   deinit {
-    NotificationCenter.default.removeObserver(TraceLogger.self)
+    NotificationCenter.default.removeObserver(MoboreTraceLogger.self)
   }
 
   func swizzle() {
@@ -78,8 +78,8 @@ internal class ViewControllerInstrumentation {
   }
 
   static func getViewControllerName(_ viewController: UIViewController) -> String? {
-    if !VCNameOverrideStore.shared().name.isEmpty {
-      return VCNameOverrideStore.shared().name
+    if !MoboreVCNameOverrideStore.shared().name.isEmpty {
+      return MoboreVCNameOverrideStore.shared().name
     }
     var title = viewController.navigationItem.title
 
@@ -106,15 +106,15 @@ internal class ViewControllerInstrumentation {
       swap { previousImplementation -> BlockSignature in { viewController in
 
         let name = "view.\(type(of: viewController))"
-        _ = ViewControllerInstrumentation
+        _ = MoboreViewControllerInstrumentation
           .traceLogger
-          .startTrace(tracer: ViewControllerInstrumentation.getTracer(),
+          .startTrace(tracer: MoboreViewControllerInstrumentation.getTracer(),
                       associatedObject: viewController,
                       name: name,
-                      preferredName: ViewControllerInstrumentation.getViewControllerName(viewController))
+                      preferredName: MoboreViewControllerInstrumentation.getViewControllerName(viewController))
 
         previousImplementation(viewController, self.selector)
-        ViewControllerInstrumentation
+        MoboreViewControllerInstrumentation
           .traceLogger
           .stopTrace(associatedObject: viewController,
                      preferredName: name)
@@ -135,12 +135,12 @@ internal class ViewControllerInstrumentation {
 
         let name = "view.\(type(of: viewController))"
 
-        _ = ViewControllerInstrumentation
+        _ = MoboreViewControllerInstrumentation
           .traceLogger
-          .startTrace(tracer: ViewControllerInstrumentation.getTracer(),
+          .startTrace(tracer: MoboreViewControllerInstrumentation.getTracer(),
                       associatedObject: viewController,
                       name: name,
-                      preferredName: ViewControllerInstrumentation.getViewControllerName(viewController))
+                      preferredName: MoboreViewControllerInstrumentation.getViewControllerName(viewController))
         previousImplementation(viewController, self.selector, animated)
 
       }}
@@ -157,12 +157,12 @@ internal class ViewControllerInstrumentation {
     func swizzle() {
       swap { previousImplementation -> BlockSignature in { viewController, animated in
         previousImplementation(viewController, self.selector, animated)
-        ViewControllerInstrumentation
+        MoboreViewControllerInstrumentation
           .traceLogger
           .stopTrace(associatedObject: viewController,
                      preferredName: getViewControllerName(viewController))
         // Ensure status is OK on the tracked view span
-        if let span = ViewControllerInstrumentation.traceLogger.getActiveSpan() {
+        if let span = MoboreViewControllerInstrumentation.traceLogger.getActiveSpan() {
           span.status = .ok
         }
       }}

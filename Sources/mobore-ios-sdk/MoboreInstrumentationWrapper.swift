@@ -15,13 +15,13 @@ import OpenTelemetryInstrumentationNetworkStatus
 #endif
 import OpenTelemetryApi
 
-class InstrumentationWrapper {
+class MoboreInstrumentationWrapper {
 
     var appMetrics: Any?
     var hangInstrumentation: HangInstrumentation?
     var lowPowerModeInstrumentation: LowPowerModeInstrumentation?
     var tapInstrumentation: TapInstrumentation?
-    var exitInstrumentation: ExitInstrumentation?
+    var exitInstrumentation: MoboreExitInstrumentation?
     #if canImport(UserNotifications) && !os(watchOS)
     var pushNotificationInstrumentation: PushNotificationInstrumentation?
     #endif
@@ -30,9 +30,9 @@ class InstrumentationWrapper {
     #endif
 
     #if os(iOS)
-      var vcInstrumentation: ViewControllerInstrumentation?
-      var applicationLifecycleInstrumentation: ApplicationLifecycleInstrumentation?
-      var sessionUsageInstrumentation: SessionUsageInstrumentation?
+      var vcInstrumentation: MoboreViewControllerInstrumentation?
+      var applicationLifecycleInstrumentation: MoboreApplicationLifecycleInstrumentation?
+      var sessionUsageInstrumentation: MoboreSessionUsageInstrumentation?
     #endif
     #if os(iOS) && !targetEnvironment(macCatalyst)
       var netstatInjector: NetworkStatusInjector?
@@ -40,18 +40,18 @@ class InstrumentationWrapper {
     #if canImport(URLSessionInstrumentation) || canImport(OpenTelemetryInstrumentationURLSession)
     var urlSessionInstrumentation: OTURLSessionInstrumentation?
     #endif
-    let config: AgentConfigManager
+    let config: MoboreAgentConfigManager
 
-    init(config: AgentConfigManager) {
+    init(config: MoboreAgentConfigManager) {
         self.config = config
 
 #if os(iOS)
         if config.instrumentation.enableLifecycleEvents {
-            applicationLifecycleInstrumentation = ApplicationLifecycleInstrumentation()
+            applicationLifecycleInstrumentation = MoboreApplicationLifecycleInstrumentation()
         }
         do {
             if self.config.instrumentation.enableViewControllerInstrumentation {
-                vcInstrumentation = try ViewControllerInstrumentation()
+                vcInstrumentation = try MoboreViewControllerInstrumentation()
             }
         } catch {
             print("failed to initalize view controller instrumentation: \(error)")
@@ -63,12 +63,12 @@ class InstrumentationWrapper {
       #if os(iOS)
         if #available(iOS 13.0, *) {
             if config.instrumentation.enableSystemMetrics {
-                _ = MemorySampler()
-                _ = CPUSampler()
+                _ = MoboreMemorySampler()
+                _ = MoboreCPUSampler()
             }
             if config.instrumentation.enableAppMetricInstrumentation {
-                appMetrics = AppMetrics()
-                if let metrics = appMetrics as? AppMetrics {
+                appMetrics = MoboreAppMetrics()
+                if let metrics = appMetrics as? MoboreAppMetrics {
                     metrics.receiveReports()
                 }
             }
@@ -92,7 +92,7 @@ class InstrumentationWrapper {
           tapInstrumentation?.start()
       }
       if config.instrumentation.enableExitInstrumentation {
-          exitInstrumentation = ExitInstrumentation()
+          exitInstrumentation = MoboreExitInstrumentation()
           exitInstrumentation?.start()
       }
       #if canImport(UserNotifications) && !os(watchOS)
@@ -110,7 +110,7 @@ class InstrumentationWrapper {
       #if os(iOS)
         if config.instrumentation.enableSessionUsageInstrumentation {
             let threshold = max(0.0, config.instrumentation.sessionInactivityThresholdSeconds)
-            sessionUsageInstrumentation = SessionUsageInstrumentation(inactivityThreshold: threshold)
+            sessionUsageInstrumentation = MoboreSessionUsageInstrumentation(inactivityThreshold: threshold)
             sessionUsageInstrumentation?.start()
         }
         vcInstrumentation?.swizzle()
@@ -131,7 +131,7 @@ class InstrumentationWrapper {
 
       // Build ignore list (prefix and regex) and default-exporter exclusions
       let instrConfig = self.config.instrumentation
-      let exporterBase = OpenTelemetryHelper.getURL(with: self.config.agent)?.absoluteString
+      let exporterBase = MoboreOpenTelemetryHelper.getURL(with: self.config.agent)?.absoluteString
       var exporterIgnorePrefixes: [String] = []
       if instrConfig.ignoreExporterURLsByDefault, let base = exporterBase {
         exporterIgnorePrefixes.append(contentsOf: ["/v1/traces", "/v1/metrics", "/v1/logs"].map { base + $0 })

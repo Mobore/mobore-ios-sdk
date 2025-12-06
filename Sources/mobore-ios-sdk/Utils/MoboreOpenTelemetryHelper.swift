@@ -4,7 +4,7 @@ import OpenTelemetrySdk
 import ResourceExtension
  
 
-public class OpenTelemetryHelper {
+public class MoboreOpenTelemetryHelper {
     struct Headers {
         static let userAgent = "User-Agent"
         static let authorization = "Authorization"
@@ -33,7 +33,7 @@ public class OpenTelemetryHelper {
         return userAgent
     }
 
-  public static func getURL(with config: AgentConfiguration) -> URL? {
+  public static func getURL(with config: MoboreAgentConfiguration) -> URL? {
 
     var port = "\(config.collectorPort)"
     if config.collectorPort == 80 || config.collectorPort == 443 {

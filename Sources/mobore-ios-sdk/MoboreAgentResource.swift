@@ -11,7 +11,7 @@ import OpenTelemetryApi
 import OpenTelemetrySdk
 import NetworkStatus
 
-public class AgentResource {
+public class MoboreAgentResource {
   public static func get(environment: String? = nil) -> Resource {
     let defaultResource = DefaultResources().get()
     var overridingAttributes = [
@@ -29,7 +29,7 @@ public class AgentResource {
     }
     // Attach current session id as a resource attribute
     overridingAttributes[MoboreAttributes.sessionId.rawValue] = AttributeValue.string(
-      SessionManager.instance.session(false)
+      MoboreSessionManager.instance.session(false)
     )
     let appDataSource = ApplicationDataSource()
 

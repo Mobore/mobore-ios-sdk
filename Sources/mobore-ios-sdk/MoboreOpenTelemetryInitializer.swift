@@ -7,10 +7,10 @@ import PersistenceExporter
 import os
 
 
-class OpenTelemetryInitializer {
+class MoboreOpenTelemetryInitializer {
   static let logLabel = "Mobore-OTLP-Exporter"
 
-  let sessionSampler: SessionSampler
+  let sessionSampler: MoboreSessionSampler
 
   static func createPersistenceFolder() -> URL? {
     do {
@@ -26,15 +26,15 @@ class OpenTelemetryInitializer {
 
 
 
-  init(sessionSampler: SessionSampler) {
+  init(sessionSampler: MoboreSessionSampler) {
     self.sessionSampler = sessionSampler
   }
 
 
 
 
-  func initializeWithHttp(_ configuration: AgentConfigManager) -> LogRecordExporter {
-    guard let endpoint =  OpenTelemetryHelper.getURL(with: configuration.agent) else {
+  func initializeWithHttp(_ configuration: MoboreAgentConfigManager) -> LogRecordExporter {
+    guard let endpoint =  MoboreOpenTelemetryHelper.getURL(with: configuration.agent) else {
       os_log("Failed to start Mobore agent: invalid collector url.")
       return NoopLogRecordExporter.instance
     }
@@ -54,12 +54,12 @@ class OpenTelemetryInitializer {
     traceSampleFilter.append(contentsOf: configuration.agent.spanFilters)
     logSampleFliter.append(contentsOf: configuration.agent.logFilters)
 
-    let headers = OpenTelemetryHelper.generateExporterHeaders(configuration.agent.auth)
+    let headers = MoboreOpenTelemetryHelper.generateExporterHeaders(configuration.agent.auth)
     let otlpConfiguration = OtlpConfiguration(
       timeout: OtlpConfiguration.DefaultTimeoutInterval,
       headers: headers)
 
-    let resources = AgentResource.get(environment: configuration.agent.environment).merging(other: AgentEnvResource.get())
+    let resources = MoboreAgentResource.get(environment: configuration.agent.environment).merging(other: MoboreAgentEnvResource.get())
     let metricExporter = {
       let metricEndpoint = URL(string: endpoint.absoluteString + "/v1/metrics")
       let defaultExporter = OtlpHttpMetricExporter(endpoint: metricEndpoint ?? endpoint, config: otlpConfiguration)
@@ -110,7 +110,7 @@ class OpenTelemetryInitializer {
           view: View.builder().build()
         )
         .setResource(resource: resources)
-        .setClock(clock: NTPClock())
+        .setClock(clock: MoboreNTPClock())
         .registerMetricReader(
           reader: PeriodicMetricReaderBuilder(
             exporter: metricExporter

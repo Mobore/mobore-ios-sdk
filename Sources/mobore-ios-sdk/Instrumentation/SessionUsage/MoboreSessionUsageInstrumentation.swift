@@ -5,7 +5,7 @@ import OpenTelemetryApi
 import UIKit
 import ObjectiveC
 
-final class SessionUsageInstrumentation: NSObject {
+final class MoboreSessionUsageInstrumentation: NSObject {
   private var timer: Timer?
   private var isAppActive = false
   private var lastActivityAt: Date = Date()
@@ -67,7 +67,7 @@ final class SessionUsageInstrumentation: NSObject {
 
   private func accumulate(seconds: Double) {
     totalActiveMs += seconds * 1000.0
-    let sessionId = SessionManager.instance.session(false)
+    let sessionId = MoboreSessionManager.instance.session(false)
       counter.add(value: seconds, attributes: [MoboreAttributes.sessionId.rawValue: .string(sessionId)])
     MoboreIosSdkAgent.setSessionAttribute(key: MoboreAttributes.sessionActiveDurationMs.rawValue, valueMs: totalActiveMs)
   }
@@ -145,8 +145,8 @@ extension UIApplication {
     set { objc_setAssociatedObject(self, &mbUsageHookInstalledKey, NSNumber(value: newValue), .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
   }
 
-  private var mb_sessionUsageInstrumentation: SessionUsageInstrumentation? {
-    get { objc_getAssociatedObject(self, &mbUsageInstrumentationKey) as? SessionUsageInstrumentation }
+  private var mb_sessionUsageInstrumentation: MoboreSessionUsageInstrumentation? {
+    get { objc_getAssociatedObject(self, &mbUsageInstrumentationKey) as? MoboreSessionUsageInstrumentation }
     set { objc_setAssociatedObject(self, &mbUsageInstrumentationKey, newValue, .OBJC_ASSOCIATION_ASSIGN) }
   }
 
@@ -161,7 +161,7 @@ extension UIApplication {
     }
   }
 
-  func mb_setSessionUsageInstrumentation(_ inst: SessionUsageInstrumentation?) {
+  func mb_setSessionUsageInstrumentation(_ inst: MoboreSessionUsageInstrumentation?) {
     self.mb_sessionUsageInstrumentation = inst
   }
 

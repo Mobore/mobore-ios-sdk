@@ -4,7 +4,7 @@ import UIKit
 #endif
 import OpenTelemetryApi
 
-final class ExitInstrumentation {
+final class MoboreExitInstrumentation {
     #if canImport(UIKit)
     private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
     #endif
@@ -65,7 +65,7 @@ final class ExitInstrumentation {
         span.end()
 
         // 3) End the session (rotate so new app start uses new session)
-        SessionManager.instance.endSession()
+        MoboreSessionManager.instance.endSession()
 
         // 4) Force flush traces and logs immediately
         MoboreSpanProcessor.forceFlushAll(timeout: 2.0)

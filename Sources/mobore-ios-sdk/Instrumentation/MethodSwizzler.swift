@@ -1,6 +1,6 @@
 import Foundation
 
-enum SwizzleError: Error {
+enum MoboreSwizzleError: Error {
     case targetNotFound(class: String, method: String)
 }
 
@@ -15,7 +15,7 @@ internal class MethodSwizzler<T, U>: Instrumentor {
         self.selector = selector
         self.klass = klass
          guard let method = class_getInstanceMethod(klass, selector) else {
-            throw SwizzleError.targetNotFound(class: NSStringFromClass(klass), method: NSStringFromSelector(selector))
+            throw MoboreSwizzleError.targetNotFound(class: NSStringFromClass(klass), method: NSStringFromSelector(selector))
         }
         target = method
     }

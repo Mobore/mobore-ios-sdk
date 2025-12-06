@@ -1,7 +1,7 @@
 import Foundation
 import PersistenceExporter
 
-public class InstrumentationConfigBuilder {
+public class MoboreInstrumentationConfigBuilder {
   var enableCrashReporting: Bool?
   var enableCrashReportingInDebugMode: Bool?
   var enableURLSessionInstrumentation: Bool?
@@ -132,8 +132,8 @@ public class InstrumentationConfigBuilder {
   }
 
 
-  public func build() -> InstrumentationConfiguration {
-    var config = InstrumentationConfiguration()
+  public func build() -> MoboreInstrumentationConfiguration {
+    var config = MoboreInstrumentationConfiguration()
 
     if let enableCrashReporting = self.enableCrashReporting {
       config.enableCrashReporting = enableCrashReporting

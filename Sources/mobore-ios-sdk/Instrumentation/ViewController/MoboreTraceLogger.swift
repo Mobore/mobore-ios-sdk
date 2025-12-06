@@ -19,7 +19,7 @@ import SwiftUI
 import UIKit
 import os
 
-class TraceLogger {
+class MoboreTraceLogger {
   private static var objectKey: UInt8 = 0
   private static var timerKey: UInt8 = 0
   private var activeSpan: Span?
@@ -77,9 +77,9 @@ class TraceLogger {
       if let preferredName = preferredName, activeSpan.name != preferredName {
         activeSpan.name = preferredName
       }
-      if !VCNameOverrideStore.shared().name.isEmpty {
-        activeSpan.name = VCNameOverrideStore.shared().name
-        VCNameOverrideStore.shared().name = ""
+      if !MoboreVCNameOverrideStore.shared().name.isEmpty {
+        activeSpan.name = MoboreVCNameOverrideStore.shared().name
+        MoboreVCNameOverrideStore.shared().name = ""
       }
       OpenTelemetry.instance.contextProvider.removeContextForSpan(activeSpan)
     }
@@ -101,9 +101,9 @@ class TraceLogger {
 
     // Emit view and navigation spans similar to old SDK behavior
     if let viewController = associatedObject as? UIViewController {
-      let tracer = ViewControllerInstrumentation.getTracer()
+      let tracer = MoboreViewControllerInstrumentation.getTracer()
 
-      let toName = TraceLogger.computeScreenName(for: viewController, preferredName: preferredName)
+      let toName = MoboreTraceLogger.computeScreenName(for: viewController, preferredName: preferredName)
 
       var fromName: String? = nil
       Self.lastViewLock.lock()
@@ -116,7 +116,7 @@ class TraceLogger {
       // Emit a view span for the appearing screen
       var attributes: [String: AttributeValue] = [
         "view.name": .string(toName),
-        "view.url": .string(TraceLogger.buildViewUrl(for: toName))
+        "view.url": .string(MoboreTraceLogger.buildViewUrl(for: toName))
       ]
       if let title = viewController.navigationItem.title, !title.isEmpty {
         attributes["view.title"] = .string(title)
@@ -144,7 +144,7 @@ class TraceLogger {
 
   private static func computeScreenName(for viewController: UIViewController, preferredName: String?) -> String {
     // Prefer explicit override set from SwiftUI via .reportName()
-    let overrideName = VCNameOverrideStore.shared().name
+    let overrideName = MoboreVCNameOverrideStore.shared().name
     if !overrideName.isEmpty {
       return overrideName
     }

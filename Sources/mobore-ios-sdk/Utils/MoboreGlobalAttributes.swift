@@ -1,8 +1,8 @@
 import Foundation
 import OpenTelemetryApi
 
-public class GlobalAttributesStore {
-  public static let shared = GlobalAttributesStore()
+public class MoboreGlobalAttributesStore {
+  public static let shared = MoboreGlobalAttributesStore()
   private let lock = NSLock()
   private var attributes: [String: AttributeValue] = [:]
 

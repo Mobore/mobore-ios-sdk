@@ -5,7 +5,7 @@ import os.log
 import Kronos
 #endif
 
-class SuccessLogOnce {
+class MoboreSuccessLogOnce {
   static let run: Void = {
     let logger  = OSLog(subsystem: "com.mobore.MoboreIosSdk", category: "NTPClock")
     os_log("NTPClock is now being used for signal timestamps.", log: logger, type: .info)
@@ -13,7 +13,7 @@ class SuccessLogOnce {
   }()
 }
 
-class FailureLogOnce {
+class MoboreFailureLogOnce {
   static let run: Void = {
     let logger  = OSLog(subsystem: "com.mobore.MoboreIosSdk", category: "NTPClock")
     os_log("NTPClock is unavailable. Using system clock as fallback for signal timestamps.", log: logger, type: .info)
@@ -21,14 +21,14 @@ class FailureLogOnce {
   }()
 }
 
-class NTPClock: OpenTelemetrySdk.Clock {
+class MoboreNTPClock: OpenTelemetrySdk.Clock {
   var now: Date {
     #if !os(watchOS)
     if let date = Kronos.Clock.now {
-      SuccessLogOnce.run
+      MoboreSuccessLogOnce.run
       return date
     }
-    FailureLogOnce.run
+    MoboreFailureLogOnce.run
     #endif
     return Date()
   }

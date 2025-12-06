@@ -2,7 +2,7 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 
-public struct AgentConfiguration {
+public struct MoboreAgentConfiguration {
   init() {}
   /// Whether to enable the agent. Defaults to true.
   public var enableAgent = true

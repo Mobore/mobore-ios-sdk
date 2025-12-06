@@ -2,14 +2,14 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 
-public class MemorySampler {
+public class MoboreMemorySampler {
     let meter: any Meter
 
     public init() {
         meter = OpenTelemetry.instance.meterProvider.meterBuilder(name: "Memory Sampler").build()
     
         _ = meter.gaugeBuilder(name: "system.memory.usage").buildWithCallback() { gauge in
-            if let memoryUsage = MemorySampler.memoryFootprint() {
+            if let memoryUsage = MoboreMemorySampler.memoryFootprint() {
                 gauge.record(value: Double(memoryUsage), attributes: ["state": AttributeValue.string("app")])
             }
         }

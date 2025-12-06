@@ -2,7 +2,7 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 
-class SessionSampler: NSObject, Sampler {
+class MoboreSessionSampler: NSObject, Sampler {
 
   private struct SimpleDecision: Decision {
     let decision: Bool
@@ -23,7 +23,7 @@ class SessionSampler: NSObject, Sampler {
   }
 
   private let accessQueue = DispatchQueue(
-    label: "SessionSampler.accessor", qos: .default, attributes: .concurrent)
+    label: "MoboreSessionSampler.accessor", qos: .default, attributes: .concurrent)
 
   private let sampleRateResolver: () -> Double
 

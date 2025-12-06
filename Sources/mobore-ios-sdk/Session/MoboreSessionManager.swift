@@ -5,12 +5,12 @@ extension Notification.Name {
     "moboreSessionManagerDidRefreshSession")
 }
 
-public class SessionManager {
+public class MoboreSessionManager {
 
   static let sessionIdKey = "mobore.session.id"
   static let sessionTimerKey = "mobore.session.timer"
   static let sessionTimeout: TimeInterval = 30 * 60
-  public static var instance = SessionManager()
+  public static var instance = MoboreSessionManager()
   private var currentId: UUID {
     get {
       UUID(uuidString: UserDefaults.standard.object(forKey: Self.sessionIdKey) as? String ?? "")

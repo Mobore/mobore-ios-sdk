@@ -9,7 +9,7 @@ import MetricKit
 #if os(iOS)
 
 @available(iOS 13.0, *)
-class AppMetrics: NSObject, MXMetricManagerSubscriber {
+class MoboreAppMetrics: NSObject, MXMetricManagerSubscriber {
   static let instrumentationName = "ApplicationMetrics"
   static let instrumentationVersion = "0.0.3"
 

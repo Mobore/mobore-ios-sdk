@@ -2,14 +2,14 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 
-public class CPUSampler {
+public class MoboreCPUSampler {
     let meter: any Meter
     public init() {
         meter = OpenTelemetry.instance.meterProvider.meterBuilder(name: "CPU Sampler").build()
 
         
         _ = meter.gaugeBuilder(name: "system.cpu.usage").buildWithCallback() { gauge in
-            if let usage = CPUSampler.cpuFootprint() {
+            if let usage = MoboreCPUSampler.cpuFootprint() {
                 gauge.record(value: Double(usage), attributes: ["state": AttributeValue.string("app")])
             }
         }
@@ -53,7 +53,7 @@ public class CPUSampler {
                     continue
                 }
 
-                let threadBasicInfo = CPUSampler.convertThreadInfoToThreadBasicInfo(thinfo)
+                let threadBasicInfo = MoboreCPUSampler.convertThreadInfoToThreadBasicInfo(thinfo)
 
                 if threadBasicInfo.flags != TH_FLAGS_IDLE {
                     totalCpuPercentage += (Double(threadBasicInfo.cpu_usage) / Double(TH_USAGE_SCALE)) * 100.0

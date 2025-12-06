@@ -1,7 +1,7 @@
 import Foundation
 import PersistenceExporter
 
-public struct InstrumentationConfiguration {
+public struct MoboreInstrumentationConfiguration {
   public var enableCrashReporting = true
   // When true, allow enabling crash reporting even while a debugger is attached (debug builds/testing)
   public var enableCrashReportingInDebugMode = false

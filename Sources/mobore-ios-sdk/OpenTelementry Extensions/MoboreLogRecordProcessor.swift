@@ -10,7 +10,7 @@ public struct MoboreLogRecordProcessor: LogRecordProcessor {
   private static var globalLogProcessor: BatchLogRecordProcessor?
   internal init(
     logRecordExporter: LogRecordExporter,
-    configuration: AgentConfiguration,
+    configuration: MoboreAgentConfiguration,
     scheduleDelay: TimeInterval = 5,
     exportTimeout: TimeInterval = 30,
     maxQueueSize: Int = 2048,
@@ -41,7 +41,7 @@ public struct MoboreLogRecordProcessor: LogRecordProcessor {
     var appendedLogRecord = MutableLogRecord(from: logRecord)
     var attrs = attributeInterceptor.intercept(appendedLogRecord.attributes)
     // Merge global attributes
-    let globals = GlobalAttributesStore.shared.getAll()
+    let globals = MoboreGlobalAttributesStore.shared.getAll()
     for (k, v) in globals { attrs[k] = v }
     appendedLogRecord.attributes = attrs
 

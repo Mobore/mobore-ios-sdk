@@ -1,7 +1,7 @@
 import Foundation
 import os.activity
 
-struct ActivityStack {
+struct MoboreActivityStack {
 
     private var items: [AnyObject] = []
 

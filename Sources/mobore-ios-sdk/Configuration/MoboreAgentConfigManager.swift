@@ -1,9 +1,9 @@
 import Foundation
 import OpenTelemetrySdk
 
-class AgentConfigManager {
-    public let agent: AgentConfiguration
-    public let instrumentation: InstrumentationConfiguration
+class MoboreAgentConfigManager {
+    public let agent: MoboreAgentConfiguration
+    public let instrumentation: MoboreInstrumentationConfiguration
 
     let serviceEnvironment: String?
     let serviceName: String?
@@ -12,8 +12,8 @@ class AgentConfigManager {
     
 
     init(resource: Resource,
-         config: AgentConfiguration,
-         instrumentationConfig: InstrumentationConfiguration) {
+         config: MoboreAgentConfiguration,
+         instrumentationConfig: MoboreInstrumentationConfiguration) {
         self.resource = resource
         self.agent = config
         self.instrumentation = instrumentationConfig

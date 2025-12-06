@@ -8,14 +8,14 @@ import OpenTelemetrySdk
 import os.log
 
 #if !os(watchOS)
-struct CrashManager {
+struct MoboreCrashManager {
   static let crashEventName: String = "crash"
   static let crashManagerVersion = "0.0.1"
   static let lastResourceDefaultsKey: String = "mobore.last.resource"
   static let instrumentationName = "CrashReporter"
   let lastResource: Resource
   private let logger = OSLog(subsystem: "com.mobore.crash-reporter", category: "instrumentation")
-  init(resource: Resource, logExporter: LogRecordExporter, agentConfiguration: AgentConfiguration) {
+  init(resource: Resource, logExporter: LogRecordExporter, agentConfiguration: MoboreAgentConfiguration) {
     // if something went wrong with the lastResource in the user defaults, fallback of the current resource data.
     var tempResource = resource
 
@@ -42,7 +42,7 @@ struct CrashManager {
   }
 
 
-  public func initializeCrashReporter(configuration: CrashManagerConfiguration) {
+  public func initializeCrashReporter(configuration: MoboreCrashManagerConfiguration) {
     // It is strongly recommended that local symbolication only be enabled for non-release builds.
     // Use [] for release versions.
     let signalHandler: PLCrashReporterSignalHandlerType = configuration.allowWhenDebuggerAttached ? .BSD : getSignalHandler()

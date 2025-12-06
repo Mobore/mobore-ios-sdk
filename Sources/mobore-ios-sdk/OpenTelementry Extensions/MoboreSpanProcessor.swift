@@ -40,7 +40,7 @@ public struct MoboreSpanProcessor: SpanProcessor {
 
   public init(
     spanExporter: SpanExporter,
-    agentConfiguration: AgentConfiguration,
+    agentConfiguration: MoboreAgentConfiguration,
     scheduleDelay: TimeInterval = 5, exportTimeout: TimeInterval = 30,
     maxQueueSize: Int = 2048, maxExportBatchSize: Int = 512,
     willExportCallback: ((inout [SpanData]) -> Void)? = nil
@@ -71,7 +71,7 @@ public struct MoboreSpanProcessor: SpanProcessor {
 
     var attrs = attributeInterceptor.intercept(span.getAttributes())
     // Merge global attributes
-    let globals = GlobalAttributesStore.shared.getAll()
+    let globals = MoboreGlobalAttributesStore.shared.getAll()
     for (k, v) in globals { attrs[k] = v }
     span.setAttributes(attrs)
 

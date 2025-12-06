@@ -2,7 +2,7 @@
 import Foundation
 import UIKit
 import OpenTelemetryApi
-public class ApplicationLifecycleInstrumentation: NSObject {
+public class MoboreApplicationLifecycleInstrumentation: NSObject {
     private static let eventName: String = "lifecycle"
     private enum State: String {
         case active

@@ -1,6 +1,6 @@
 import Foundation
 
-class CrashManagerConfiguration {
+class MoboreCrashManagerConfiguration {
   var sessionId: String?
   var networkStatus: String?
   var allowWhenDebuggerAttached: Bool = false

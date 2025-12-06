@@ -16,8 +16,8 @@ public class MoboreIosSdkAgent {
  public static let name = "mobore-ios-sdk"
 
   public static func start(
-    with configuration: AgentConfiguration,
-    _ instrumentationConfiguration: InstrumentationConfiguration = InstrumentationConfiguration()
+    with configuration: MoboreAgentConfiguration,
+    _ instrumentationConfiguration: MoboreInstrumentationConfiguration = MoboreInstrumentationConfiguration()
   ) {
     if !configuration.enableAgent {
       os_log("Mobore iOS SDK has been disabled.")
@@ -32,7 +32,7 @@ public class MoboreIosSdkAgent {
   }
 
   public static func start() {
-    MoboreIosSdkAgent.start(with: AgentConfiguration())
+    MoboreIosSdkAgent.start(with: MoboreAgentConfiguration())
   }
 
   public class func shared() -> MoboreIosSdkAgent? {
@@ -41,21 +41,21 @@ public class MoboreIosSdkAgent {
 
   private static var instance: MoboreIosSdkAgent?
 
-  let instrumentation: InstrumentationWrapper
+  let instrumentation: MoboreInstrumentationWrapper
 
   #if !os(watchOS)
-  let crashManager: CrashManager?
+  let crashManager: MoboreCrashManager?
   #endif
 
   let crashLogExporter: LogRecordExporter
 
-  let agentConfigManager: AgentConfigManager
+  let agentConfigManager: MoboreAgentConfigManager
 
-  let openTelemetry: OpenTelemetryInitializer
+  let openTelemetry: MoboreOpenTelemetryInitializer
 
-  let sessionSampler: SessionSampler
+  let sessionSampler: MoboreSessionSampler
 
-  let crashConfig = CrashManagerConfiguration()
+  let crashConfig = MoboreCrashManagerConfiguration()
 
   // Root session span to act as the parent for all app spans
   private var rootSessionSpan: Span?
@@ -78,33 +78,33 @@ public class MoboreIosSdkAgent {
   }
 
   private init(
-    configuration: AgentConfiguration, instrumentationConfiguration: InstrumentationConfiguration
+    configuration: MoboreAgentConfiguration, instrumentationConfiguration: MoboreInstrumentationConfiguration
   ) {
-    crashConfig.sessionId = SessionManager.instance.session(false)
+    crashConfig.sessionId = MoboreSessionManager.instance.session(false)
     #if os(iOS) && !targetEnvironment(macCatalyst)
       crashConfig.networkStatus = (try? NetworkStatus())?.status().0
     #endif // os(iOS) && !targetEnvironment(macCatalyst)
 
     crashConfig.allowWhenDebuggerAttached = instrumentationConfiguration.enableCrashReportingInDebugMode
 
-    _ = SessionManager.instance.session()  // initialize session
-    agentConfigManager = AgentConfigManager(
-      resource: AgentResource.get(environment: configuration.environment).merging(other: AgentEnvResource.get()), config: configuration,
+    _ = MoboreSessionManager.instance.session()  // initialize session
+    agentConfigManager = MoboreAgentConfigManager(
+      resource: MoboreAgentResource.get(environment: configuration.environment).merging(other: MoboreAgentEnvResource.get()), config: configuration,
       instrumentationConfig: instrumentationConfiguration)
 
-    sessionSampler = SessionSampler({
+    sessionSampler = MoboreSessionSampler({
       configuration.sampleRate
     })
 
-    instrumentation = InstrumentationWrapper(config: agentConfigManager)
+    instrumentation = MoboreInstrumentationWrapper(config: agentConfigManager)
 
-    openTelemetry = OpenTelemetryInitializer(sessionSampler: sessionSampler)
+    openTelemetry = MoboreOpenTelemetryInitializer(sessionSampler: sessionSampler)
     crashLogExporter = openTelemetry.initializeWithHttp(agentConfigManager)
 
     #if !os(watchOS)
     if instrumentationConfiguration.enableCrashReporting {
-      crashManager = CrashManager(
-        resource: AgentResource.get(environment: configuration.environment).merging(other: AgentEnvResource.get()),
+      crashManager = MoboreCrashManager(
+        resource: MoboreAgentResource.get(environment: configuration.environment).merging(other: MoboreAgentEnvResource.get()),
         logExporter: crashLogExporter,
         agentConfiguration: configuration)
     } else {
@@ -153,7 +153,7 @@ public class MoboreIosSdkAgent {
       .get(instrumentationName: "RUM", instrumentationVersion: MoboreIosSdkAgent.moboreSwiftAgentVersion)
     let span = tracer
       .spanBuilder(spanName: "mobile-session")
-      .setAttribute(key: MoboreAttributes.sessionId.rawValue, value: .string(SessionManager.instance.session(false)))
+      .setAttribute(key: MoboreAttributes.sessionId.rawValue, value: .string(MoboreSessionManager.instance.session(false)))
       .startSpan()
     OpenTelemetry.instance.contextProvider.setActiveSpan(span)
     // Also set active on main thread to ensure UI-driven calls see a parent
@@ -214,7 +214,7 @@ public class MoboreIosSdkAgent {
   public static func setUser(_ user: [String: String]) {
     var attrs: [String: AttributeValue] = [:]
     for (k, v) in user { attrs["user.\(k)"] = .string(v) }
-    GlobalAttributesStore.shared.setMany(attrs)
+    MoboreGlobalAttributesStore.shared.setMany(attrs)
   }
 
   public static func addAction(name: String, type: String = "custom", attributes: [String: Any] = [:]) {
@@ -303,7 +303,7 @@ public class MoboreIosSdkAgent {
   }
 
   public static func addGlobalAttribute(key: String, value: String) {
-    GlobalAttributesStore.shared.set(key: key, value: .string(value))
+    MoboreGlobalAttributesStore.shared.set(key: key, value: .string(value))
   }
 
   public static func addGlobalAttributes(_ attrs: [String: String]) {
@@ -325,7 +325,7 @@ public class MoboreIosSdkAgent {
   }
 
   public static func removeGlobalAttribute(key: String) {
-    GlobalAttributesStore.shared.remove(key: key)
+    MoboreGlobalAttributesStore.shared.remove(key: key)
   }
 
   // View-scoped helpers
@@ -393,10 +393,10 @@ public class MoboreIosSdkAgent {
         startView(name: name ?? "unknown", url: url)
         return
       }
-      let tracer = ViewControllerInstrumentation.getTracer()
+      let tracer = MoboreViewControllerInstrumentation.getTracer()
       let defaultName = "\(type(of: vc))"
-      let preferred = name ?? ViewControllerInstrumentation.getViewControllerName(vc)
-      let span = ViewControllerInstrumentation
+      let preferred = name ?? MoboreViewControllerInstrumentation.getViewControllerName(vc)
+      let span = MoboreViewControllerInstrumentation
         .traceLogger
         .startTrace(tracer: tracer,
                     associatedObject: vc,
@@ -410,7 +410,7 @@ public class MoboreIosSdkAgent {
   public static func endUIViewControllerView() {
     Task { @MainActor in
       let vc = findTopViewController()
-      ViewControllerInstrumentation
+      MoboreViewControllerInstrumentation
         .traceLogger
         .stopTrace(associatedObject: vc ?? NSObject(),
                    preferredName: nil)
