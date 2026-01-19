@@ -3,7 +3,7 @@
 ## Summary
 Task: Add GitHub Actions workflow to compile and validate the Mobore iOS SDK project using CocoaPods.
 
-**Current Status**: Fixes pushed (Pod names corrected). CI running.
+**Current Status**: Fixes pushed (SPM core deps added, Pod names reverted). CI running.
 
 **PR**: https://github.com/Mobore/mobore-ios-sdk/pull/1  
 **Branch**: `ci/add-github-workflow`
@@ -29,8 +29,9 @@ Current workflow has two jobs:
 1. **build-spm**: Builds with Swift Package Manager via xcodebuild
 2. **validate-podspec**: Runs `pod lib lint`
 
-### 6. Fixes Applied (Round 3)
-- **MoboreIosSdk.podspec**: Renamed dependencies from `OpenTelemetry-Swift-*` to `OpenTelemetry*` (e.g., `OpenTelemetrySdk`, `OpenTelemetryApi`). The previous names were likely incorrect and causing `pod lib lint` to fail resolution.
+### 7. Fixes Applied (Round 4)
+- **Package.swift**: Added `opentelemetry-swift-core` dependency. Directed `OpenTelemetryApi` and `OpenTelemetrySdk` dependencies to come from this package instead of `opentelemetry-swift` (where they don't exist as products).
+- **MoboreIosSdk.podspec**: Reverted names back to `OpenTelemetry-Swift-*` format. The issue was likely not the names themselves but potentially versions or the missing `Api` pod which was added in Round 1.
 
 ---
 
@@ -162,9 +163,6 @@ CocoaPods may have different module names than SPM.
 
 1. **Verify CI passes** (Check GitHub Actions)
 2. **Merge PR** once green
-3. **If CI fails**:
-    - Check if `OpenTelemetry` pod names in Podspec need further adjustment (e.g. `OpenTelemetryProtocolExporterHttp` vs `OpenTelemetrySwiftProtocolExporterHttp`).
-    - Check for Swift compilation errors in `MoboreIosSdkAgent.swift` regarding `LogRecordExporter`.
 
 ---
 
