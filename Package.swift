@@ -17,10 +17,10 @@ let package = Package(
   ],
   dependencies: [
     .package(
-      url: "https://github.com/open-telemetry/opentelemetry-swift", .upToNextMajor(from: "2.2.1")),
-    .package(url: "https://github.com/MobileNativeFoundation/Kronos.git", .upToNextMajor(from: "4.2.2")),
+      url: "https://github.com/open-telemetry/opentelemetry-swift", .upToNextMajor(from: "2.3.0")),
+    .package(url: "https://github.com/MobileNativeFoundation/Kronos.git", .upToNextMajor(from: "4.3.1")),
     .package(
-      url: "https://github.com/microsoft/plcrashreporter.git", .upToNextMajor(from: "1.12.0")),
+      url: "https://github.com/microsoft/plcrashreporter.git", .upToNextMajor(from: "1.12.2")),
   ],
   targets: [
     .target(

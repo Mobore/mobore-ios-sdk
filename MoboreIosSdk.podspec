@@ -30,14 +30,13 @@ Pod::Spec.new do |spec|
 
   # OpenTelemetry dependencies
   spec.dependency "OpenTelemetry-Swift-Sdk", "~> 2.3.0"
-  spec.dependency "OpenTelemetry-Swift-SdkResourceExtension", "~> 2.2.1"
-  spec.dependency "OpenTelemetry-Swift-PersistenceExporter", "~> 2.2.1"
-  spec.dependency "OpenTelemetry-Swift-Instrumentation-URLSession", "~> 2.2.1"
-  spec.dependency "OpenTelemetry-Swift-Protocol-Exporter-Http", "~> 2.2.1"
-  spec.dependency "OpenTelemetry-Swift-Instrumentation-NetworkStatus", "~> 2.2.1"
-  # spec.dependency "OpenTelemetry-Swift-BaggagePropagationProcessor", "~> 2.1.0"
+  spec.dependency "OpenTelemetry-Swift-SdkResourceExtension", "~> 2.3.0"
+  spec.dependency "OpenTelemetry-Swift-PersistenceExporter", "~> 2.3.0"
+  spec.dependency "OpenTelemetry-Swift-Instrumentation-URLSession", "~> 2.3.0"
+  spec.dependency "OpenTelemetry-Swift-Protocol-Exporter-Http", "~> 2.3.0"
+  spec.dependency "OpenTelemetry-Swift-Instrumentation-NetworkStatus", "~> 2.3.0"
 
   # Other dependencies
-  spec.dependency 'Kronos', '~> 4.2'
+  spec.dependency 'Kronos', '~> 4.3'
   spec.dependency 'PLCrashReporter', '~> 1.12'
 end
