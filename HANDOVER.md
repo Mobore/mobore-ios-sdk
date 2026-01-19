@@ -3,7 +3,7 @@
 ## Summary
 Task: Add GitHub Actions workflow to compile and validate the Mobore iOS SDK project using CocoaPods.
 
-**Current Status**: Fixes pushed (SPM core deps added, Pod names reverted). CI running.
+**Current Status**: Fixes pushed (WebView concurrency). CI running.
 
 **PR**: https://github.com/Mobore/mobore-ios-sdk/pull/1  
 **Branch**: `ci/add-github-workflow`
@@ -29,9 +29,10 @@ Current workflow has two jobs:
 1. **build-spm**: Builds with Swift Package Manager via xcodebuild
 2. **validate-podspec**: Runs `pod lib lint`
 
-### 7. Fixes Applied (Round 4)
-- **Package.swift**: Added `opentelemetry-swift-core` dependency. Directed `OpenTelemetryApi` and `OpenTelemetrySdk` dependencies to come from this package instead of `opentelemetry-swift` (where they don't exist as products).
-- **MoboreIosSdk.podspec**: Reverted names back to `OpenTelemetry-Swift-*` format. The issue was likely not the names themselves but potentially versions or the missing `Api` pod which was added in Round 1.
+### 8. Fixes Applied (Round 5)
+- **WebViewInstrumentation.swift**: Updated `MoboreWebViewNavigationDelegateProxy` to address concurrency warnings (errors in strict mode).
+    - Marked delegate methods as `nonisolated` to satisfy the `WKNavigationDelegate` protocol requirements which are non-isolated.
+    - Wrapped calls to MainActor-isolated properties/methods (like `instrumentation` and `externalDelegate`) inside `Task { @MainActor in ... }` blocks.
 
 ---
 
