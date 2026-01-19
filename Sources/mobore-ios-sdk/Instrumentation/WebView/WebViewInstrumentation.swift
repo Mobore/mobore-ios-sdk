@@ -93,46 +93,56 @@ final class MoboreWebViewNavigationDelegateProxy: NSObject, WKNavigationDelegate
   weak var externalDelegate: WKNavigationDelegate?
   weak var instrumentation: WebViewInstrumentation?
 
-  func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-    instrumentation?.recordRequest(navigationAction: navigationAction)
+  nonisolated func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+    Task { @MainActor in
+      instrumentation?.recordRequest(navigationAction: navigationAction)
 
-    if let externalDelegate,
-       externalDelegate.responds(to: NSSelectorFromString("webView:decidePolicyForNavigationAction:decisionHandler:")) {
-      externalDelegate.webView?(webView, decidePolicyFor: navigationAction, decisionHandler: decisionHandler)
-    } else {
-      decisionHandler(.allow)
+      if let externalDelegate,
+         externalDelegate.responds(to: NSSelectorFromString("webView:decidePolicyForNavigationAction:decisionHandler:")) {
+        externalDelegate.webView?(webView, decidePolicyFor: navigationAction, decisionHandler: decisionHandler)
+      } else {
+        decisionHandler(.allow)
+      }
     }
   }
 
-  func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-    instrumentation?.recordStart(webView: webView)
-    if let externalDelegate,
-       externalDelegate.responds(to: #selector(WKNavigationDelegate.webView(_:didStartProvisionalNavigation:))) {
-      externalDelegate.webView?(webView, didStartProvisionalNavigation: navigation)
+  nonisolated func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+    Task { @MainActor in
+      instrumentation?.recordStart(webView: webView)
+      if let externalDelegate,
+         externalDelegate.responds(to: #selector(WKNavigationDelegate.webView(_:didStartProvisionalNavigation:))) {
+        externalDelegate.webView?(webView, didStartProvisionalNavigation: navigation)
+      }
     }
   }
 
-  func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-    instrumentation?.recordFinish(webView: webView)
-    if let externalDelegate,
-       externalDelegate.responds(to: #selector(WKNavigationDelegate.webView(_:didFinish:))) {
-      externalDelegate.webView?(webView, didFinish: navigation)
+  nonisolated func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    Task { @MainActor in
+      instrumentation?.recordFinish(webView: webView)
+      if let externalDelegate,
+         externalDelegate.responds(to: #selector(WKNavigationDelegate.webView(_:didFinish:))) {
+        externalDelegate.webView?(webView, didFinish: navigation)
+      }
     }
   }
 
-  func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-    instrumentation?.recordError(webView: webView, error: error)
-    if let externalDelegate,
-       externalDelegate.responds(to: #selector(WKNavigationDelegate.webView(_:didFail:withError:))) {
-      externalDelegate.webView?(webView, didFail: navigation, withError: error)
+  nonisolated func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+    Task { @MainActor in
+      instrumentation?.recordError(webView: webView, error: error)
+      if let externalDelegate,
+         externalDelegate.responds(to: #selector(WKNavigationDelegate.webView(_:didFail:withError:))) {
+        externalDelegate.webView?(webView, didFail: navigation, withError: error)
+      }
     }
   }
 
-  func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-    instrumentation?.recordError(webView: webView, error: error)
-    if let externalDelegate,
-       externalDelegate.responds(to: #selector(WKNavigationDelegate.webView(_:didFailProvisionalNavigation:withError:))) {
-      externalDelegate.webView?(webView, didFailProvisionalNavigation: navigation, withError: error)
+  nonisolated func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+    Task { @MainActor in
+      instrumentation?.recordError(webView: webView, error: error)
+      if let externalDelegate,
+         externalDelegate.responds(to: #selector(WKNavigationDelegate.webView(_:didFailProvisionalNavigation:withError:))) {
+        externalDelegate.webView?(webView, didFailProvisionalNavigation: navigation, withError: error)
+      }
     }
   }
 }
