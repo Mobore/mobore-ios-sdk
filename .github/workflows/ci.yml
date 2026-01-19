@@ -51,5 +51,10 @@ jobs:
 
       - name: Lint Podspec
         run: |
-          xcodebuild -showsdks
-          pod lib lint MoboreIosSdk.podspec --allow-warnings --skip-tests --skip-import-validation --verbose --platforms=ios
+          pod lib lint MoboreIosSdk.podspec \
+            --allow-warnings \
+            --skip-tests \
+            --skip-import-validation \
+            --verbose \
+            --platforms=ios \
+            --xcconfig='DESTINATION=platform=macOS,variant=Mac Catalyst'

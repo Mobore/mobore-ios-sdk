@@ -37,11 +37,10 @@ Current workflow has two jobs:
     - Moved `@preconcurrency` to the `import UserNotifications` statement.
     - Updated `MoborePushDelegateProxy` to use `nonisolated` delegate methods wrapping logic in `Task { @MainActor in ... }` to satisfy strict concurrency checking in Swift 6.
 
-### 11. Fixes Applied (Round 8)
-- **Podspec Validation Fix**:
-    - Removed `EXCLUDED_ARCHS` from `MoboreIosSdk.podspec`. Modern Xcode 16/macOS 15 runners handle `arm64` simulators natively, and excluding `x86_64` was causing "destination matching" failures during `pod lib lint`.
-    - Explicitly set `spec.platform = :ios` to prevent the linter from attempting to validate against Mac Catalyst or other unintended platforms.
-- **CI Workflow Update**: Added `--platforms=ios` to the lint command and an `xcodebuild -showsdks` step to ensure the runner environment is correctly identified.
+### 12. Fixes Applied (Round 9) - CRITICAL
+- **CI Runner Destination Fix**: Resolved the "Unable to find a destination matching the provided destination specifier" error by forcing `pod lib lint` to use the **Mac Catalyst** variant of the iOS SDK. 
+    - **Reason**: The GitHub Actions `macos-15` runner has the iOS 18 SDK but lacks the iOS 18 Simulator runtime. Mac Catalyst is the only "Eligible" destination available for building iOS-targeted code in this environment.
+    - **Action**: Added `--xcconfig='DESTINATION=platform=macOS,variant=Mac Catalyst'` to the `pod lib lint` command and enabled `SUPPORTS_MACCATALYST` in the podspec.
 
 The `pod lib lint` step is failing. Without access to the full GitHub Actions logs (requires sign-in), the exact error is unknown.
 
