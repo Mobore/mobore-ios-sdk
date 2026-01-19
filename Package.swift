@@ -18,6 +18,8 @@ let package = Package(
   dependencies: [
     .package(
       url: "https://github.com/open-telemetry/opentelemetry-swift", .upToNextMajor(from: "2.3.0")),
+    .package(
+      url: "https://github.com/open-telemetry/opentelemetry-swift-core", .upToNextMajor(from: "2.3.0")),
     .package(url: "https://github.com/MobileNativeFoundation/Kronos.git", .upToNextMajor(from: "4.3.1")),
     .package(
       url: "https://github.com/microsoft/plcrashreporter.git", .upToNextMajor(from: "1.12.2")),
@@ -26,8 +28,8 @@ let package = Package(
     .target(
       name: "MoboreIosSdk",
       dependencies: [
-        .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
-        .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
+        .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
+        .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift-core"),
         .product(name: "OpenTelemetryProtocolExporterHTTP", package: "opentelemetry-swift"),
         .product(name: "PersistenceExporter", package: "opentelemetry-swift"),
         .product(name: "URLSessionInstrumentation", package: "opentelemetry-swift"),

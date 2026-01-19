@@ -29,13 +29,13 @@ Pod::Spec.new do |spec|
   spec.static_framework = true
 
   # OpenTelemetry dependencies
-  spec.dependency "OpenTelemetryApi", "~> 2.3.0"
-  spec.dependency "OpenTelemetrySdk", "~> 2.3.0"
-  spec.dependency "OpenTelemetryResourceExtension", "~> 2.3.0"
-  spec.dependency "OpenTelemetryPersistenceExporter", "~> 2.3.0"
-  spec.dependency "OpenTelemetryInstrumentationURLSession", "~> 2.3.0"
-  spec.dependency "OpenTelemetryProtocolExporterHttp", "~> 2.3.0"
-  spec.dependency "OpenTelemetryInstrumentationNetworkStatus", "~> 2.3.0"
+  spec.dependency "OpenTelemetry-Swift-Api", "~> 2.3.0"
+  spec.dependency "OpenTelemetry-Swift-Sdk", "~> 2.3.0"
+  spec.dependency "OpenTelemetry-Swift-SdkResourceExtension", "~> 2.3.0"
+  spec.dependency "OpenTelemetry-Swift-PersistenceExporter", "~> 2.3.0"
+  spec.dependency "OpenTelemetry-Swift-Instrumentation-URLSession", "~> 2.3.0"
+  spec.dependency "OpenTelemetry-Swift-Protocol-Exporter-Http", "~> 2.3.0"
+  spec.dependency "OpenTelemetry-Swift-Instrumentation-NetworkStatus", "~> 2.3.0"
 
   # Other dependencies
   spec.dependency 'Kronos', '~> 4.3'
