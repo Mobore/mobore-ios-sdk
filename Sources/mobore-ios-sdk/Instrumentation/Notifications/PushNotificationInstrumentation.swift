@@ -1,7 +1,7 @@
 import Foundation
 import OpenTelemetryApi
 #if canImport(UserNotifications) && !os(watchOS)
-import UserNotifications
+@preconcurrency import UserNotifications
 import ObjectiveC
 
 final class PushNotificationInstrumentation: NSObject {
@@ -68,37 +68,41 @@ final class PushNotificationInstrumentation: NSObject {
 
 // MARK: - Delegate proxy & swizzling
 
-final class MoborePushDelegateProxy: NSObject, @preconcurrency UNUserNotificationCenterDelegate {
+final class MoborePushDelegateProxy: NSObject, UNUserNotificationCenterDelegate {
     weak var externalDelegate: UNUserNotificationCenterDelegate?
     weak var instrumentation: PushNotificationInstrumentation?
 
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter,
                                             willPresent notification: UNNotification,
                                             withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        instrumentation?.recordPushReceived(notification: notification)
+        Task { @MainActor in
+            instrumentation?.recordPushReceived(notification: notification)
 
-        if let externalDelegate,
-           externalDelegate.responds(to: #selector(UNUserNotificationCenterDelegate.userNotificationCenter(_:willPresent:withCompletionHandler:))) {
-            externalDelegate.userNotificationCenter?(center, willPresent: notification, withCompletionHandler: completionHandler)
-        } else {
-            #if os(iOS)
-            completionHandler([.banner, .sound, .badge])
-            #else
-            completionHandler([.alert, .sound, .badge])
-            #endif
+            if let externalDelegate,
+               externalDelegate.responds(to: #selector(UNUserNotificationCenterDelegate.userNotificationCenter(_:willPresent:withCompletionHandler:))) {
+                externalDelegate.userNotificationCenter?(center, willPresent: notification, withCompletionHandler: completionHandler)
+            } else {
+                #if os(iOS)
+                completionHandler([.banner, .sound, .badge])
+                #else
+                completionHandler([.alert, .sound, .badge])
+                #endif
+            }
         }
     }
 
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter,
                                             didReceive response: UNNotificationResponse,
                                             withCompletionHandler completionHandler: @escaping () -> Void) {
-        instrumentation?.recordPushTapped(response: response)
+        Task { @MainActor in
+            instrumentation?.recordPushTapped(response: response)
 
-        if let externalDelegate,
-           externalDelegate.responds(to: #selector(UNUserNotificationCenterDelegate.userNotificationCenter(_:didReceive:withCompletionHandler:))) {
-            externalDelegate.userNotificationCenter?(center, didReceive: response, withCompletionHandler: completionHandler)
-        } else {
-            completionHandler()
+            if let externalDelegate,
+               externalDelegate.responds(to: #selector(UNUserNotificationCenterDelegate.userNotificationCenter(_:didReceive:withCompletionHandler:))) {
+                externalDelegate.userNotificationCenter?(center, didReceive: response, withCompletionHandler: completionHandler)
+            } else {
+                completionHandler()
+            }
         }
     }
 }
