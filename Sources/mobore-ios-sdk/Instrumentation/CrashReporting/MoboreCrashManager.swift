@@ -2,6 +2,7 @@
 import CrashReporter
 #endif
 import Foundation
+import Darwin
 import OpenTelemetryApi
 import OpenTelemetrySdk
 
