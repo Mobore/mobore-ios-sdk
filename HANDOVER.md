@@ -162,6 +162,9 @@ CocoaPods may have different module names than SPM.
 
 1. **Verify CI passes** (Check GitHub Actions)
 2. **Merge PR** once green
+3. **If CI fails**:
+    - Check if `OpenTelemetry` pod names in Podspec need further adjustment (e.g. `OpenTelemetryProtocolExporterHttp` vs `OpenTelemetrySwiftProtocolExporterHttp`).
+    - Check for Swift compilation errors in `MoboreIosSdkAgent.swift` regarding `LogRecordExporter`.
 
 ---
 
