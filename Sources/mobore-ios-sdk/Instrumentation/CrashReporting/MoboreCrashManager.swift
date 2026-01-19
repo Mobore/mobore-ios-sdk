@@ -136,17 +136,15 @@ struct MoboreCrashManager {
   }
   
   private func isDebuggerAttached() -> Bool {
+    var name = [CTL_KERN, KERN_PROC, KERN_PROC_PID, getpid()]
     var info = kinfo_proc()
-    let infoSize = UnsafeMutablePointer<Int>.allocate(capacity: 1)
-    infoSize[0] = MemoryLayout<kinfo_proc>.size
-    let name = UnsafeMutablePointer<Int32>.allocate(capacity: 4)
+    var infoSize = MemoryLayout<kinfo_proc>.size
 
-    name[0] = CTL_KERN
-    name[1] = KERN_PROC
-    name[2] = KERN_PROC_PID
-    name[3] = getpid()
+    let result = name.withUnsafeMutableBufferPointer { namePtr in
+      sysctl(namePtr.baseAddress, 4, &info, &infoSize, nil, 0)
+    }
 
-    if sysctl(name, 4, &info, infoSize, nil, 0) == -1 {
+    if result == -1 {
       os_log("sysctl() failed: %@",
              log: logger,
              type:.error,
@@ -154,11 +152,7 @@ struct MoboreCrashManager {
       return false
     }
 
-    if (info.kp_proc.p_flag & P_TRACED) != 0 {
-      return true
-    }
-
-    return false
+    return (info.kp_proc.p_flag & P_TRACED) != 0
   }
 }
 
