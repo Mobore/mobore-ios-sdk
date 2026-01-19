@@ -89,9 +89,12 @@ struct MoboreCrashManager {
             SemanticAttributes.exceptionType.rawValue: AttributeValue.string(report.signalInfo.name),
             SemanticAttributes.exceptionStacktrace.rawValue: AttributeValue.string(text)
           ]
-          // TODO:get from lastResource
-          if let lastSessionId = configuration.sessionId {
-            attributes[MoboreAttributes.sessionId.rawValue] = AttributeValue.string(lastSessionId)
+          // Prefer the session that was active when the crash occurred (persisted resource),
+          // fall back to the current configuration if missing.
+          if let persistedSessionAttr = lastResource.attributes[MoboreAttributes.sessionId.rawValue] {
+            attributes[MoboreAttributes.sessionId.rawValue] = persistedSessionAttr
+          } else if let lastSessionId = configuration.sessionId {
+            attributes[MoboreAttributes.sessionId.rawValue] = .string(lastSessionId)
           }
 
           if let lastNetworkStatus = configuration.networkStatus {

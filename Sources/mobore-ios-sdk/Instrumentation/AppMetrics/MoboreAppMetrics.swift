@@ -12,6 +12,7 @@ import MetricKit
 class MoboreAppMetrics: NSObject, MXMetricManagerSubscriber {
   static let instrumentationName = "ApplicationMetrics"
   static let instrumentationVersion = "0.0.3"
+  private static let eventDomain = "device"
 
   enum LaunchTimeValues: String {
     case key = "type"
@@ -39,6 +40,15 @@ class MoboreAppMetrics: NSObject, MXMetricManagerSubscriber {
   let meter = OpenTelemetry.instance.meterProvider
     .meterBuilder(name: instrumentationName)
     .build()
+
+  private lazy var otelLogger: OpenTelemetryApi.Logger = {
+    OpenTelemetry.instance
+      .loggerProvider
+      .loggerBuilder(instrumentationScopeName: Self.instrumentationName)
+      .setInstrumentationVersion(Self.instrumentationVersion)
+      .setEventDomain(Self.eventDomain)
+      .build()
+  }()
 
   func receiveReports() {
     let shared = MXMetricManager.shared
@@ -207,10 +217,69 @@ class MoboreAppMetrics: NSObject, MXMetricManagerSubscriber {
     }
   }
 
-  // TODO: Receive diagnostics immediately when available.
   @available(iOS 14.0, *)
   func didReceive(_ payloads: [MXDiagnosticPayload]) {
-    // Process diagnostics.
+    for payload in payloads {
+      var payloadAttrs: [String: AttributeValue] = [:]
+      payloadAttrs["metrickit.payload.time_start"] = .string(payload.timeStampBegin.description)
+      payloadAttrs["metrickit.payload.time_end"] = .string(payload.timeStampEnd.description)
+
+      if let crashDiagnostics = payload.crashDiagnostics {
+        for crash in crashDiagnostics {
+          var attrs = payloadAttrs
+          attrs["metrickit.diagnostic.type"] = .string("crash")
+          attrs["metrickit.diagnostic.description"] = .string(String(describing: crash))
+          attrs["metrickit.diagnostic.callstack_tree"] = .string(String(describing: crash.callStackTree))
+
+          otelLogger.eventBuilder(name: "metrickit.diagnostic.crash")
+            .setSeverity(.fatal)
+            .setAttributes(attrs)
+            .emit()
+        }
+      }
+
+      if let hangDiagnostics = payload.hangDiagnostics {
+        for hang in hangDiagnostics {
+          var attrs = payloadAttrs
+          attrs["metrickit.diagnostic.type"] = .string("hang")
+          attrs["metrickit.diagnostic.description"] = .string(String(describing: hang))
+          attrs["metrickit.diagnostic.callstack_tree"] = .string(String(describing: hang.callStackTree))
+
+          otelLogger.eventBuilder(name: "metrickit.diagnostic.hang")
+            .setSeverity(.error)
+            .setAttributes(attrs)
+            .emit()
+        }
+      }
+
+      if let cpuDiagnostics = payload.cpuExceptionDiagnostics {
+        for cpu in cpuDiagnostics {
+          var attrs = payloadAttrs
+          attrs["metrickit.diagnostic.type"] = .string("cpu_exception")
+          attrs["metrickit.diagnostic.description"] = .string(String(describing: cpu))
+          attrs["metrickit.diagnostic.callstack_tree"] = .string(String(describing: cpu.callStackTree))
+
+          otelLogger.eventBuilder(name: "metrickit.diagnostic.cpu_exception")
+            .setSeverity(.error)
+            .setAttributes(attrs)
+            .emit()
+        }
+      }
+
+      if let diskDiagnostics = payload.diskWriteExceptionDiagnostics {
+        for disk in diskDiagnostics {
+          var attrs = payloadAttrs
+          attrs["metrickit.diagnostic.type"] = .string("disk_write_exception")
+          attrs["metrickit.diagnostic.description"] = .string(String(describing: disk))
+          attrs["metrickit.diagnostic.callstack_tree"] = .string(String(describing: disk.callStackTree))
+
+          otelLogger.eventBuilder(name: "metrickit.diagnostic.disk_write_exception")
+            .setSeverity(.error)
+            .setAttributes(attrs)
+            .emit()
+        }
+      }
+    }
   }
 
 }
