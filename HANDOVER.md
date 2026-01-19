@@ -3,7 +3,7 @@
 ## Summary
 Task: Add GitHub Actions workflow to compile and validate the Mobore iOS SDK project using CocoaPods.
 
-**Current Status**: Fixes pushed (WebView concurrency). CI running.
+**Current Status**: Fixes pushed (CI upgraded to macOS 15, Concurrency fixed). CI running.
 
 **PR**: https://github.com/Mobore/mobore-ios-sdk/pull/1  
 **Branch**: `ci/add-github-workflow`
@@ -29,10 +29,13 @@ Current workflow has two jobs:
 1. **build-spm**: Builds with Swift Package Manager via xcodebuild
 2. **validate-podspec**: Runs `pod lib lint`
 
-### 8. Fixes Applied (Round 5)
-- **WebViewInstrumentation.swift**: Updated `MoboreWebViewNavigationDelegateProxy` to address concurrency warnings (errors in strict mode).
-    - Marked delegate methods as `nonisolated` to satisfy the `WKNavigationDelegate` protocol requirements which are non-isolated.
-    - Wrapped calls to MainActor-isolated properties/methods (like `instrumentation` and `externalDelegate`) inside `Task { @MainActor in ... }` blocks.
+### 9. Fixes Applied (Round 6)
+- **CI Environment**: Upgraded GitHub Actions workflow to use `macos-15` and `Xcode 16.0`.
+    - **Reason**: The `opentelemetry-swift` 2.3.0 dependency chain includes `grpc-swift` 1.27.1, which mandates Swift 6 tools (available only in Xcode 16+). The previous `macos-14` runner with Xcode 15.4 was insufficient.
+- **PushNotificationInstrumentation.swift**:
+    - Removed incorrect usage of `@preconcurrency` on the class inheritance clause.
+    - Moved `@preconcurrency` to the `import UserNotifications` statement.
+    - Updated `MoborePushDelegateProxy` to use `nonisolated` delegate methods wrapping logic in `Task { @MainActor in ... }` to satisfy strict concurrency checking in Swift 6.
 
 ---
 
