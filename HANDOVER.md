@@ -3,7 +3,7 @@
 ## Summary
 Task: Add GitHub Actions workflow to compile and validate the Mobore iOS SDK project using CocoaPods.
 
-**Current Status**: Fixes pushed (import Darwin, podspec dependency). CI running.
+**Current Status**: Fixes pushed (Package.swift deps, safer sysctl). CI running.
 
 **PR**: https://github.com/Mobore/mobore-ios-sdk/pull/1  
 **Branch**: `ci/add-github-workflow`
@@ -29,9 +29,9 @@ Current workflow has two jobs:
 1. **build-spm**: Builds with Swift Package Manager via xcodebuild
 2. **validate-podspec**: Runs `pod lib lint`
 
-### 4. Fixes Applied (Committed)
-- **MoboreCrashManager.swift**: Added `import Darwin` to fix missing `sysctl`/`kinfo_proc` symbols.
-- **MoboreIosSdk.podspec**: Added `OpenTelemetry-Swift-Api` dependency to fix missing module issues during linting.
+### 5. Fixes Applied (Round 2)
+- **Package.swift**: Added `OpenTelemetryApi` and `OpenTelemetrySdk` to `MoboreIosSdk` target dependencies. This fixes missing module errors during SPM build.
+- **MoboreCrashManager.swift**: Refactored `sysctl` usage to avoid manual pointer allocation/leaks and use safer Swift pointer idioms.
 
 ---
 
