@@ -12,9 +12,7 @@ Pod::Spec.new do |spec|
   spec.ios.deployment_target = "16.0"
   
   spec.pod_target_xcconfig = {
-    'OTHER_SWIFT_FLAGS' => '$(inherited) -DOpenTelemetry',
-    'SUPPORTS_MACCATALYST' => 'YES',
-    'DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER' => 'YES'
+    'OTHER_SWIFT_FLAGS' => '$(inherited) -DOpenTelemetry'
   }
   
   spec.source           = { :git => "https://github.com/mobore/mobore-ios-sdk.git", :tag => spec.version.to_s }

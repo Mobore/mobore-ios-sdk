@@ -56,5 +56,4 @@ jobs:
             --skip-tests \
             --skip-import-validation \
             --verbose \
-            --platforms=ios \
-            --xcconfig='DESTINATION=platform=macOS,variant=Mac Catalyst'
+            --platforms=ios
