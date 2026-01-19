@@ -3,7 +3,7 @@
 ## Summary
 Task: Add GitHub Actions workflow to compile and validate the Mobore iOS SDK project using CocoaPods.
 
-**Current Status**: CI workflow created but failing. Needs debugging on macOS with Xcode.
+**Current Status**: Fixes pushed (import Darwin, podspec dependency). CI running.
 
 **PR**: https://github.com/Mobore/mobore-ios-sdk/pull/1  
 **Branch**: `ci/add-github-workflow`
@@ -28,6 +28,10 @@ File: `.github/workflows/ci.yml`
 Current workflow has two jobs:
 1. **build-spm**: Builds with Swift Package Manager via xcodebuild
 2. **validate-podspec**: Runs `pod lib lint`
+
+### 4. Fixes Applied (Committed)
+- **MoboreCrashManager.swift**: Added `import Darwin` to fix missing `sysctl`/`kinfo_proc` symbols.
+- **MoboreIosSdk.podspec**: Added `OpenTelemetry-Swift-Api` dependency to fix missing module issues during linting.
 
 ---
 
@@ -157,12 +161,8 @@ CocoaPods may have different module names than SPM.
 
 ## Next Steps
 
-1. **View the full CI logs** (requires GitHub login) to see exact error
-2. **Run `pod lib lint` locally** on macOS with Xcode 15+ to reproduce the error
-3. **Fix the compilation errors** in the Swift source files
-4. **Push fixes** to the `ci/add-github-workflow` branch
-5. **Verify CI passes**
-6. **Merge PR** once green
+1. **Verify CI passes** (Check GitHub Actions)
+2. **Merge PR** once green
 
 ---
 
