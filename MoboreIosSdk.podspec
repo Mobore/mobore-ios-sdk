@@ -10,13 +10,10 @@ Pod::Spec.new do |spec|
 
   spec.swift_version = "5.10"
   spec.ios.deployment_target = "16.0"
-  # Limit to iOS only to avoid incompatible transitive pods on other platforms
+  spec.platform = :ios, "16.0"
 
   spec.pod_target_xcconfig = {
-    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386 x86_64'
-  }
-  spec.user_target_xcconfig = {
-    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386 x86_64'
+    'OTHER_SWIFT_FLAGS' => '$(inherited) -DOpenTelemetry'
   }
   
   spec.source           = { :git => "https://github.com/mobore/mobore-ios-sdk.git", :tag => spec.version.to_s }

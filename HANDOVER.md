@@ -37,13 +37,11 @@ Current workflow has two jobs:
     - Moved `@preconcurrency` to the `import UserNotifications` statement.
     - Updated `MoborePushDelegateProxy` to use `nonisolated` delegate methods wrapping logic in `Task { @MainActor in ... }` to satisfy strict concurrency checking in Swift 6.
 
-### 10. Fixes Applied (Round 7)
-- **OpenTelemetry API Alignment**: Fixed several incorrect OTel Swift API usages that were likely causing compilation errors during `pod lib lint`:
-    - Replaced non-existent `eventBuilder(name:)` and `setEventDomain(_:)` with standard `logRecordBuilder()` and `emit()` calls in `MoboreAppMetrics`, `MoboreCrashManager`, and `MoboreIosSdkAgent`.
-    - Corrected asynchronous gauge instrumentation in `MoboreCPUSampler` and `MoboreMemorySampler` to use `observe()` instead of `record()` within callbacks.
-    - Removed incorrect `mutating` keywords from `MoboreSpanProcessor` methods to comply with the `SpanProcessor` protocol.
-- **SwiftUI Module Reference**: Updated `SwiftUICore.View` to `SwiftUI.View` in `MoboreViewControllerInstrumentation` for broader compatibility.
-- **Project Structure**: Fixed a typo in the directory name from `OpenTelementry Extensions` to `OpenTelemetry Extensions`.
+### 11. Fixes Applied (Round 8)
+- **Podspec Validation Fix**:
+    - Removed `EXCLUDED_ARCHS` from `MoboreIosSdk.podspec`. Modern Xcode 16/macOS 15 runners handle `arm64` simulators natively, and excluding `x86_64` was causing "destination matching" failures during `pod lib lint`.
+    - Explicitly set `spec.platform = :ios` to prevent the linter from attempting to validate against Mac Catalyst or other unintended platforms.
+- **CI Workflow Update**: Added `--platforms=ios` to the lint command and an `xcodebuild -showsdks` step to ensure the runner environment is correctly identified.
 
 The `pod lib lint` step is failing. Without access to the full GitHub Actions logs (requires sign-in), the exact error is unknown.
 

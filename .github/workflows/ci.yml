@@ -50,4 +50,6 @@ jobs:
         run: gem install cocoapods
 
       - name: Lint Podspec
-        run: pod lib lint MoboreIosSdk.podspec --allow-warnings --skip-tests --skip-import-validation --verbose
+        run: |
+          xcodebuild -showsdks
+          pod lib lint MoboreIosSdk.podspec --allow-warnings --skip-tests --skip-import-validation --verbose --platforms=ios
