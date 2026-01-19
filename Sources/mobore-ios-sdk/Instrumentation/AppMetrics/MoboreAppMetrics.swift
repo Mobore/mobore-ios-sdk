@@ -46,7 +46,6 @@ class MoboreAppMetrics: NSObject, MXMetricManagerSubscriber {
       .loggerProvider
       .loggerBuilder(instrumentationScopeName: Self.instrumentationName)
       .setInstrumentationVersion(Self.instrumentationVersion)
-      .setEventDomain(Self.eventDomain)
       .build()
   }()
 
@@ -231,7 +230,7 @@ class MoboreAppMetrics: NSObject, MXMetricManagerSubscriber {
           attrs["metrickit.diagnostic.description"] = .string(String(describing: crash))
           attrs["metrickit.diagnostic.callstack_tree"] = .string(String(describing: crash.callStackTree))
 
-          otelLogger.eventBuilder(name: "metrickit.diagnostic.crash")
+          otelLogger.logRecordBuilder()
             .setSeverity(.fatal)
             .setAttributes(attrs)
             .emit()
@@ -245,7 +244,7 @@ class MoboreAppMetrics: NSObject, MXMetricManagerSubscriber {
           attrs["metrickit.diagnostic.description"] = .string(String(describing: hang))
           attrs["metrickit.diagnostic.callstack_tree"] = .string(String(describing: hang.callStackTree))
 
-          otelLogger.eventBuilder(name: "metrickit.diagnostic.hang")
+          otelLogger.logRecordBuilder()
             .setSeverity(.error)
             .setAttributes(attrs)
             .emit()
@@ -259,7 +258,7 @@ class MoboreAppMetrics: NSObject, MXMetricManagerSubscriber {
           attrs["metrickit.diagnostic.description"] = .string(String(describing: cpu))
           attrs["metrickit.diagnostic.callstack_tree"] = .string(String(describing: cpu.callStackTree))
 
-          otelLogger.eventBuilder(name: "metrickit.diagnostic.cpu_exception")
+          otelLogger.logRecordBuilder()
             .setSeverity(.error)
             .setAttributes(attrs)
             .emit()
@@ -273,7 +272,7 @@ class MoboreAppMetrics: NSObject, MXMetricManagerSubscriber {
           attrs["metrickit.diagnostic.description"] = .string(String(describing: disk))
           attrs["metrickit.diagnostic.callstack_tree"] = .string(String(describing: disk.callStackTree))
 
-          otelLogger.eventBuilder(name: "metrickit.diagnostic.disk_write_exception")
+          otelLogger.logRecordBuilder()
             .setSeverity(.error)
             .setAttributes(attrs)
             .emit()

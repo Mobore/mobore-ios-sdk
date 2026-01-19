@@ -37,9 +37,13 @@ Current workflow has two jobs:
     - Moved `@preconcurrency` to the `import UserNotifications` statement.
     - Updated `MoborePushDelegateProxy` to use `nonisolated` delegate methods wrapping logic in `Task { @MainActor in ... }` to satisfy strict concurrency checking in Swift 6.
 
----
-
-## Current Failure
+### 10. Fixes Applied (Round 7)
+- **OpenTelemetry API Alignment**: Fixed several incorrect OTel Swift API usages that were likely causing compilation errors during `pod lib lint`:
+    - Replaced non-existent `eventBuilder(name:)` and `setEventDomain(_:)` with standard `logRecordBuilder()` and `emit()` calls in `MoboreAppMetrics`, `MoboreCrashManager`, and `MoboreIosSdkAgent`.
+    - Corrected asynchronous gauge instrumentation in `MoboreCPUSampler` and `MoboreMemorySampler` to use `observe()` instead of `record()` within callbacks.
+    - Removed incorrect `mutating` keywords from `MoboreSpanProcessor` methods to comply with the `SpanProcessor` protocol.
+- **SwiftUI Module Reference**: Updated `SwiftUICore.View` to `SwiftUI.View` in `MoboreViewControllerInstrumentation` for broader compatibility.
+- **Project Structure**: Fixed a typo in the directory name from `OpenTelementry Extensions` to `OpenTelemetry Extensions`.
 
 The `pod lib lint` step is failing. Without access to the full GitHub Actions logs (requires sign-in), the exact error is unknown.
 

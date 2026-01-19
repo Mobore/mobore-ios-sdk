@@ -76,7 +76,6 @@ struct MoboreCrashManager {
           .loggerProvider
           .loggerBuilder(instrumentationScopeName: Self.instrumentationName)
           .setInstrumentationVersion(Self.crashManagerVersion)
-          .setEventDomain("device")
           .build()
 
         // Retrieving crash reporter data.
@@ -106,7 +105,7 @@ struct MoboreCrashManager {
               "\(code) at \(report.signalInfo.address)")
           }
             
-            otLogger.eventBuilder(name: Self.crashEventName)
+            otLogger.logRecordBuilder()
             .setSeverity(.fatal)
             .setAttributes(attributes)
             .emit()

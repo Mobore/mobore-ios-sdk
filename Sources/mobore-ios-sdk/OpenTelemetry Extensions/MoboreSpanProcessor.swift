@@ -92,7 +92,7 @@ public struct MoboreSpanProcessor: SpanProcessor {
     processor.onStart(parentContext: parentContext, span: span)
   }
 
-  public mutating func onEnd(span: OpenTelemetrySdk.ReadableSpan) {
+  public func onEnd(span: OpenTelemetrySdk.ReadableSpan) {
 
     // Remove from active spans immediately to avoid double-ending
     Self.activeSpansLock.lock()
@@ -106,7 +106,7 @@ public struct MoboreSpanProcessor: SpanProcessor {
     processor.onEnd(span: span)
   }
 
-  public mutating func shutdown(explicitTimeout: TimeInterval? = nil) {
+  public func shutdown(explicitTimeout: TimeInterval? = nil) {
     processor.shutdown(explicitTimeout: explicitTimeout)
   }
 

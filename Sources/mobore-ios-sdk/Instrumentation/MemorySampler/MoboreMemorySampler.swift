@@ -10,7 +10,7 @@ public class MoboreMemorySampler {
     
         _ = meter.gaugeBuilder(name: "system.memory.usage").buildWithCallback() { gauge in
             if let memoryUsage = MoboreMemorySampler.memoryFootprint() {
-                gauge.record(value: Double(memoryUsage), attributes: ["state": AttributeValue.string("app")])
+                gauge.observe(value: Double(memoryUsage), attributes: ["state": AttributeValue.string("app")])
             }
         }
     }

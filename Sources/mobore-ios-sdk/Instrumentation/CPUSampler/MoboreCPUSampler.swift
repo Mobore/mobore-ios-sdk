@@ -10,7 +10,7 @@ public class MoboreCPUSampler {
         
         _ = meter.gaugeBuilder(name: "system.cpu.usage").buildWithCallback() { gauge in
             if let usage = MoboreCPUSampler.cpuFootprint() {
-                gauge.record(value: Double(usage), attributes: ["state": AttributeValue.string("app")])
+                gauge.observe(value: Double(usage), attributes: ["state": AttributeValue.string("app")])
             }
         }
     }

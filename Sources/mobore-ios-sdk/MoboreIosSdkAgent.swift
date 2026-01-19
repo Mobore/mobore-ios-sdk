@@ -239,13 +239,13 @@ public class MoboreIosSdkAgent {
   }
 
   public static func addError(message: String, source: String? = nil, stack: String? = nil) {
-    let logger = OpenTelemetry.instance.loggerProvider.loggerBuilder(instrumentationScopeName: "RUM").setEventDomain("device").build()
+    let logger = OpenTelemetry.instance.loggerProvider.loggerBuilder(instrumentationScopeName: "RUM").build()
     var attrs: [String: AttributeValue] = [
       SemanticAttributes.exceptionMessage.rawValue: .string(message)
     ]
     if let source { attrs["error.source"] = .string(source) }
     if let stack { attrs[SemanticAttributes.exceptionStacktrace.rawValue] = .string(stack) }
-    logger.eventBuilder(name: SemanticAttributes.exception.rawValue)
+    logger.logRecordBuilder()
       .setSeverity(.error)
       .setAttributes(attrs)
       .emit()
@@ -259,7 +259,6 @@ public class MoboreIosSdkAgent {
   public static func addLog(message: String, level: String = "info", attributes: [String: Any] = [:]) {
     let logger = OpenTelemetry.instance.loggerProvider
       .loggerBuilder(instrumentationScopeName: "RUM")
-      .setEventDomain("app")
       .build()
 
     var attrs: [String: AttributeValue] = [:]
@@ -274,7 +273,7 @@ public class MoboreIosSdkAgent {
     }
 
     logger
-      .eventBuilder(name: "log")
+      .logRecordBuilder()
       .setBody(AttributeValue.string(message))
       .setSeverity(severity(from: level))
       .setAttributes(attrs)

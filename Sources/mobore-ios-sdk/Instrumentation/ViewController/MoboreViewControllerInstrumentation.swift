@@ -15,7 +15,7 @@ private extension NSLock {
 }
 
 @available(iOS 13.0, *)
-public extension SwiftUICore.View {
+public extension SwiftUI.View {
   func reportName(_ name: String) -> Self {
     MoboreVCNameOverrideStore.shared().name = name
     return self
